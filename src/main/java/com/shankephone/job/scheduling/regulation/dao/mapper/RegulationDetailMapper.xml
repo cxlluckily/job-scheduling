@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shankephone.job.scheduling.regulation.dao.RegulationDetailDao">
+
+	<insert id="insert"
+		parameterType="com.shankephone.job.scheduling.regulation.model.RegulationDetail">
+		INSERT INTO regulation_detail
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			regulation_id,
+			col_name,
+			col_value,
+			operator,
+			col_type
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			#{regulation_id},
+			#{col_name},
+			#{col_value},
+			#{operator},
+			#{col_type}
+		</trim>
+	</insert>
+
+	<delete id="deleteById">
+		delete from regulation_detail where id = #{id} 
+	</delete>
+
+	<update id="update"
+		parameterType="com.shankephone.job.scheduling.regulation.model.RegulationDetail">
+		update regulation_detail set 
+			regulation_id = #{regulation_id},
+			col_name = #{col_name},
+			col_value = #{col_value},
+			operator = #{operator},
+			col_type = #{col_type}
+		where id = #{id} 
+	</update>
+
+	<select id="queryById"
+		resultType="com.shankephone.job.scheduling.regulation.model.RegulationDetail">
+		select regulation_id,
+			col_name,
+			col_value,
+			operator,
+			col_type
+		from regulation_detail
+		where id = #{id} 
+	</select>
+
+	<select id="queryList"
+		resultType="com.shankephone.job.scheduling.regulation.model.RegulationDetail">
+		select * from regulation_detail 
+	</select>
+</mapper>
+
+
+
+
+
+

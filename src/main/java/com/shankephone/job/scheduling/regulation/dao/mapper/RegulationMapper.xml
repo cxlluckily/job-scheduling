@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shankephone.job.scheduling.regulation.dao.RegulationDao">
+
+	<insert id="insert"
+		parameterType="com.shankephone.job.scheduling.regulation.model.Regulation">
+		INSERT INTO regulation
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			source_id,
+			db_name,
+			table_name,
+			create_time
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			#{source_id},
+			#{db_name},
+			#{table_name},
+			now()
+		</trim>
+	</insert>
+
+	<delete id="deleteById">
+		delete from regulation where id = #{id} 
+	</delete>
+
+	<update id="update"
+		parameterType="com.shankephone.job.scheduling.regulation.model.Regulation">
+		update regulation set 
+			source_id = #{source_id},
+			db_name = #{db_name},
+			table_name = #{table_name},
+			modify_time = #{modify_time}
+		where id = #{id} 
+	</update>
+
+	<select id="queryById"
+		resultType="com.shankephone.job.scheduling.regulation.model.Regulation">
+		select source_id,
+			db_name,
+			table_name
+		from regulation
+		where id = #{id} 
+	</select>
+
+	<select id="queryList"
+		resultType="com.shankephone.job.scheduling.regulation.model.Regulation">
+		select * from regulation order by create_time desc
+	</select>
+</mapper>
+
+
+
+
+
+
