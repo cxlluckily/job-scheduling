@@ -8,8 +8,8 @@ import java.util.Date;
  * @author fengql
  * @version 2018年3月30日 下午6:17:41
  */
-public class DBDataSource {
-
+public class DBDataSource extends BaseModel{
+	private static final long serialVersionUID = 1L;
 	private String id;
 	private String master_url;
 	private String master_username;

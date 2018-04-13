@@ -1,7 +1,6 @@
 Ext.define('Dcs.main.GlobalController', {
     extend: 'Ext.app.Controller',
     alias: 'controller.global',
-
     routes  : {
         ':id': {
             action: 'handleRoute',
@@ -12,7 +11,6 @@ Ext.define('Dcs.main.GlobalController', {
     beforeHandleRoute: function(id, action) {
         var me = this,
             node = Ext.StoreMgr.get('navigation').getNodeById(id);
-
         if (node) {
             //resume action
             action.resume();
@@ -64,12 +62,8 @@ Ext.define('Dcs.main.GlobalController', {
         	}
         	var tab = contentTabs.items.get(node.get('id'));
     		if (!tab) {
-    			tab = contentTabs.add({
-        			itemId : node.get('id'),
-        	        title: node.get('text'),
-        	        iconCls: node.get('iconCls'),
-        	        items : [this.createTabItem(node)]
-        	    });
+    			//修改-添加tab页面
+    			tab = this.addTabItem(tab,node);
     		}
         	contentTabs.setActiveTab(tab);
         } else {
@@ -101,6 +95,34 @@ Ext.define('Dcs.main.GlobalController', {
             navigationBreadcrumb.setSelection(node);
             navigationBreadcrumb.child(':last').focus();
         }
+    },
+    
+    addTabItem : function(tab,node) {
+    	var me = this;
+    	var contentTabs =  me.getContentTabsView();
+    	var itemId = node.get('id');
+    	var t;
+		if(itemId == 'reglist'){
+			t = Ext.create('Dcs.reg.RegListView');
+			tab = contentTabs.add(t);
+		} else if(itemId == 'registryCenterList'){
+			t = Ext.create('Dcs.job.RegistryCenterListView');
+			tab = contentTabs.add(t);
+		} else if(itemId == 'dataSourceList'){
+			t = Ext.create('Dcs.job.DataSourceListView');
+			tab = contentTabs.add(t);
+		} else if(itemId == 'regsource'){
+			t = Ext.create('Dcs.regsource.RegSourceView');
+			tab = contentTabs.add(t);
+		} else {
+			tab = contentTabs.add({
+    			itemId : node.get('id'),
+    	        title: node.get('text'),
+    	        iconCls: node.get('iconCls'),
+    	        items : [this.createTabItem(node)]
+    	    });
+		}
+		return tab;
     },
     
     createTabItem : function(node) {

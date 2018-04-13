@@ -8,7 +8,7 @@
 	 http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
 	 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 
-	<context:component-scan base-package="com.shankephone.job.scheduling.*"/>
+	<context:component-scan base-package="com.shankephone.*"/>
 	
 	<bean id="propertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -58,13 +58,14 @@
 		<property name="mapperLocations">
 			<list>
 				<value>classpath:com/shankephone/job/scheduling/**/dao/mapper/*.xml</value>
+				<value>classpath:com/shankephone/elasticjob/dao/mapper/*.xml</value>
 			</list>
 		</property>
 		<property name="dataSource" ref="mysql_dataSource" />
 	</bean>
 	
 	<bean id="mysql" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.shankephone.job.scheduling.*.dao" />
+		<property name="basePackage" value="com.shankephone.job.scheduling.*.dao,com.shankephone.elasticjob.dao" />
 		<property name="sqlSessionFactoryBeanName" value="sqlMapClient" />
 	</bean>
 	

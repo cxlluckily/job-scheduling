@@ -100,8 +100,20 @@ Ext.define('Dcs.main.MainController', {
         var record = records[0];
         // Ignore the initialize to the "all" node.
         if (record && !record.isRoot()) {
-            this.redirectTo(record.getId());
+        	this.redirectTo(record.getId());
         }
+    },
+    
+    addTabPanel : function(record){
+    	var tabpanel = Ext.getCmp('contentTabsView');
+    	var viewType = record.getId();
+    	var reglist = Ext.ComponentQuery.query(viewType);
+    	if(viewType == 'reglist'){
+    		var t = Ext.create('Dcs.reg.RegListView',{renderTo : tabpanel.getId()});
+    		tabpanel.add(t);
+        } /*else {
+        	this.redirectTo(record.getId());
+        }*/
     },
 
     onBreadcrumbNavSelectionChange: function(breadcrumb, node) {
@@ -141,7 +153,7 @@ Ext.define('Dcs.main.MainController', {
             }
         }
     },
-
+    
     onNavFilterClearTriggerClick: function() {
         this.getReferences().navtreeFilter.setValue();
     },

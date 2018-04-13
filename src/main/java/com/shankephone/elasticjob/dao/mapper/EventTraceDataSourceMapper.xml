@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shankephone.elasticjob.dao.EventTraceDataSourceDao">
+
+	<insert id="insert"
+		parameterType="com.shankephone.elasticjob.model.EventTraceDataSource">
+		INSERT INTO job_event_trace_source
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			name,
+			driver,
+			url,
+			username,
+			password,
+			activated,
+			create_time
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			#{name},
+			#{driver},
+			#{url},
+			#{username},
+			#{password},
+			#{activated},
+			#{create_time}
+		</trim>
+	</insert>
+
+	<delete id="deleteById">
+		delete from job_event_trace_source where id = #{id} 
+	</delete>
+
+	<update id="update"
+		parameterType="com.shankephone.elasticjob.model.EventTraceDataSource">
+		update job_event_trace_source set 
+			name = #{name},
+			driver = #{driver},
+			url = #{url},
+			username = #{username},
+			password = #{password},
+			activated = #{activated},
+			update_time = #{update_time}
+		where id = #{id} 
+	</update>
+
+	<select id="queryById"
+		resultType="com.shankephone.elasticjob.model.EventTraceDataSource">
+		select *
+		from job_event_trace_source 
+		where id = #{id} 
+	</select>
+
+	<select id="queryList"
+		resultType="com.shankephone.elasticjob.model.EventTraceDataSource">
+		select * from job_event_trace_source order by create_time desc
+	</select>
+</mapper>
+
+
+
+
+
+

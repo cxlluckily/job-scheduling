@@ -2,11 +2,17 @@ package com.shankephone.job.scheduling.regulation.model;
 
 import java.util.Date;
 
-public class Regulation {
+public class Regulation extends BaseModel{
+	private static final long serialVersionUID = 1L;
 	private String id;
 	private String source_id;
+	private String name;
 	private String db_name;
 	private String table_name;
+	private String col_name;
+	private String col_value;
+	private String operator;
+	private String sql_txt;
 	private Date create_time;
 	private Date modify_time;
 
@@ -42,6 +48,30 @@ public class Regulation {
 		this.table_name = table_name;
 	}
 
+	public String getCol_name() {
+		return col_name;
+	}
+
+	public void setCol_name(String col_name) {
+		this.col_name = col_name;
+	}
+
+	public String getCol_value() {
+		return col_value;
+	}
+
+	public void setCol_value(String col_value) {
+		this.col_value = col_value;
+	}
+
+	public String getOperator() {
+		return operator;
+	}
+
+	public void setOperator(String operator) {
+		this.operator = operator;
+	}
+
 	public Date getCreate_time() {
 		return create_time;
 	}
@@ -56,6 +86,22 @@ public class Regulation {
 
 	public void setModify_time(Date modify_time) {
 		this.modify_time = modify_time;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSql_txt() {
+		return sql_txt;
+	}
+
+	public void setSql_txt(String sql_txt) {
+		this.sql_txt = sql_txt;
 	}
 
 	

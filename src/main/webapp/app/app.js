@@ -1,16 +1,15 @@
-Ext.enableAriaButtons = false;
+/*Ext.enableAriaButtons = false;
 Ext.Loader.setPath('Dcs', 'app');
 Ext.Loader.setConfig({
 	disableCaching: false
 });
-
+*/
 Ext.define('Dcs.Application', {
 	extend : 'Ext.app.Application',
-
     controllers: [
-                  'Dcs.main.GlobalController'
-              ],
-              
+	      'Dcs.main.GlobalController'
+	  ],
+    name: 'Dcs',         
 	init : function() {
 		this.setDefaultToken('all');
 		Ext.tip.QuickTipManager.init();
@@ -19,7 +18,7 @@ Ext.define('Dcs.Application', {
 
 	launch : function() {
 		Ext.get("loading").hide();
-		Ext.create('Dcs.main.MainView');
+		Ext.create('Dcs.Main');
 	}
 });
 

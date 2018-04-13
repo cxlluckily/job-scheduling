@@ -1,6 +1,7 @@
 package com.shankephone.job.scheduling.regulation.model;
 
-public class RegulationDetail {
+public class RegulationDetail extends BaseModel{
+	private static final long serialVersionUID = 1L;
 	private String id;
 	private String regulation_id;
 	private String col_name;

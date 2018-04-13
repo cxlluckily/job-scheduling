@@ -9,14 +9,24 @@
 		INSERT INTO regulation
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			source_id,
+			name,
 			db_name,
 			table_name,
+			col_name,
+			col_value,
+			operator,
+			sql_txt,
 			create_time
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			#{source_id},
+			#{name},
 			#{db_name},
 			#{table_name},
+			#{col_name},
+			#{col_value},
+			#{operator},
+			#{sql_txt},
 			now()
 		</trim>
 	</insert>
@@ -29,17 +39,20 @@
 		parameterType="com.shankephone.job.scheduling.regulation.model.Regulation">
 		update regulation set 
 			source_id = #{source_id},
+			name = #{name},
 			db_name = #{db_name},
 			table_name = #{table_name},
+			col_name = #{col_name},
+			col_value = #{col_value},
+			operator = #{operator},
+			sql_txt = #{sql_txt},
 			modify_time = #{modify_time}
 		where id = #{id} 
 	</update>
 
 	<select id="queryById"
 		resultType="com.shankephone.job.scheduling.regulation.model.Regulation">
-		select source_id,
-			db_name,
-			table_name
+		select *
 		from regulation
 		where id = #{id} 
 	</select>

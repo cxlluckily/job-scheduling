@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shankephone.elasticjob.dao.RegistryCenterDao">
+
+	<insert id="insert"
+		parameterType="com.shankephone.elasticjob.model.RegistryCenter">
+		INSERT INTO job_registry_center
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			name,
+			zklist,
+			namespace,
+			digest,
+			activated,
+			create_time,
+			update_time
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			#{name},
+			#{zklist},
+			#{namespace},
+			#{digest},
+			#{activated},
+			#{createTime},
+			#{updateTime}
+		</trim>
+	</insert>
+
+	<delete id="deleteById">
+		delete from job_registry_center where id = #{id} 
+	</delete>
+
+	<update id="update"
+		parameterType="com.shankephone.elasticjob.model.RegistryCenter">
+		update job_registry_center set 
+			name = #{name},
+			zklist = #{zklist},
+			namespace = #{namespace},
+			digest = #{digest},
+			activated = #{activated},
+			create_time = #{createTime},
+			update_time = #{updateTime}
+		where id = #{id} 
+	</update>
+
+	<select id="queryById"
+		resultType="com.shankephone.elasticjob.model.RegistryCenter">
+		select *
+		from job_registry_center 
+		where id = #{id} 
+	</select>
+
+	<select id="queryList"
+		resultType="com.shankephone.elasticjob.model.RegistryCenter">
+		select * from job_registry_center order by create_time desc
+	</select>
+	
+	<select id="loadActivated"
+		resultType="com.shankephone.elasticjob.model.RegistryCenter">
+		select * from job_registry_center where activated = 1;
+	</select>
+	
+	<select id="find"
+		resultType="com.shankephone.elasticjob.model.RegistryCenter">
+		select * from job_registry_center where name = #{name};
+	</select>
+	
+	<update id="updateActivated" parameterType="com.shankephone.elasticjob.model.RegistryCenter">
+		update job_registry_center set 
+			activated = 1
+		where id = #{id} ;
+		update job_registry_center set 
+			activated = 0
+		where id &lt;&gt; #{id} 
+	</update>
+	
+</mapper>
+
+
+
+
+
+
