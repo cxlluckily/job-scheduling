@@ -50,15 +50,20 @@
 		from job_registry_center 
 		where id = #{id} 
 	</select>
+	
+	<select id="queryTotalCount"
+		resultType="java.lang.Long">
+		select count(*) from job_registry_center
+	</select>
 
 	<select id="queryList"
 		resultType="com.shankephone.elasticjob.model.RegistryCenter">
-		select * from job_registry_center order by create_time desc
+		select * from job_registry_center order by create_time desc limit #{start}, #{limit}
 	</select>
 	
 	<select id="loadActivated"
 		resultType="com.shankephone.elasticjob.model.RegistryCenter">
-		select * from job_registry_center where activated = 1;
+		select * from job_registry_center where activated = 1
 	</select>
 	
 	<select id="find"

@@ -13,8 +13,7 @@
 			url,
 			username,
 			password,
-			activated,
-			create_time
+			activated
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			#{name},
@@ -22,8 +21,7 @@
 			#{url},
 			#{username},
 			#{password},
-			#{activated},
-			#{create_time}
+			#{activated}
 		</trim>
 	</insert>
 
@@ -39,8 +37,7 @@
 			url = #{url},
 			username = #{username},
 			password = #{password},
-			activated = #{activated},
-			update_time = #{update_time}
+			activated = #{activated}
 		where id = #{id} 
 	</update>
 
@@ -53,8 +50,27 @@
 
 	<select id="queryList"
 		resultType="com.shankephone.elasticjob.model.EventTraceDataSource">
-		select * from job_event_trace_source order by create_time desc
+		select * from job_event_trace_source 
 	</select>
+	
+	<select id="loadActivated"
+		resultType="com.shankephone.elasticjob.model.EventTraceDataSource">
+		select * from job_event_trace_source where activated = 1 
+	</select>
+	
+	<select id="find"
+		resultType="com.shankephone.elasticjob.model.EventTraceDataSource">
+		select * from job_event_trace_source where name = #{name};
+	</select>
+	
+	<update id="updateActivated" parameterType="com.shankephone.elasticjob.model.EventTraceDataSource">
+		update job_event_trace_source set 
+			activated = 1
+		where id = #{id} ;
+		update job_event_trace_source set 
+			activated = 0
+		where id &lt;&gt; #{id} 
+	</update>
 </mapper>
 
 

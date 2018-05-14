@@ -1,4 +1,4 @@
-Ext.define('Dcs.main.ContentPanelView', {
+Ext.define('App.main.ContentPanelView', {
     extend: 'Ext.panel.Panel',
     xtype: 'contentPanel',
     id: 'content-panel',
@@ -9,22 +9,21 @@ Ext.define('Dcs.main.ContentPanelView', {
     header: {
         hidden: true
     },
-    items : [{
-    	xtype : 'contentTabs'
+    items: [{
+        xtype: 'contentTabs'
     }],
-	initComponent : function() {
-        Ext.create('Dcs.main.ThumbnailsStore', {
+    initComponent: function () {
+        Ext.create('App.main.ThumbnailsStore', {
             storeId: 'Thumbnails'
-        });		
-		this.callParent();
-	}
+        });
+        this.callParent();
+    }
 });
-
-Ext.define('Dcs.main.Breadcrumb', {
+Ext.define('App.main.Breadcrumb', {
     extend: 'Ext.toolbar.Toolbar',
     xtype: 'navigation-toolbar',
     reference: 'navigation-toolbar',
-    hidden : true,
+    hidden: true,
     items: [{
         xtype: 'tool',
         type: 'down',
@@ -45,7 +44,7 @@ Ext.define('Dcs.main.Breadcrumb', {
     }]
 });
 
-Ext.define('Dcs.main.ThumbnailsStore', {
+Ext.define('App.main.ThumbnailsStore', {
     extend: 'Ext.data.Store',
     // even though this is not a tree store, it uses a TreeModel because it contains
     // records from the navigation tree.
@@ -54,16 +53,16 @@ Ext.define('Dcs.main.ThumbnailsStore', {
 });
 
 
-Ext.define('Dcs.main.Thumbnails', {
+Ext.define('App.main.Thumbnails', {
     extend: 'Ext.view.View',
-    id :'thumbnailsView',
+    id: 'thumbnailsView',
     xtype: 'thumbnails',
     cls: 'thumbnails',
     reference: 'contentView',
     store: 'Thumbnails',
     itemSelector: '.thumbnail-item',
-    initComponent: function() {
-    	var profileCookie = Ext.util.Cookies.get("profile");
+    initComponent: function () {
+        var profileCookie = Ext.util.Cookies.get("profile");
         var backgrounds = {
             crisp: 'border-circle',
             'crisp-touch': 'circle',
@@ -73,66 +72,74 @@ Ext.define('Dcs.main.Thumbnails', {
             gray: 'rounded-square',
             triton: 'square'
         };
-        
+
         this.tpl =
             '<tpl for=".">' +
-                '<div class="thumbnail-item">' +
-                    '<div class="thumbnail-icon-wrap bg-' + backgrounds[profileCookie] + '">' +
-                        '<div class="thumbnail-icon {iconCls}"></div>' +
-                    '</div>' +
-                    '<div class="thumbnail-text">{text}</div>' +
-                '</div>' +
+            '<div class="thumbnail-item">' +
+            '<div class="thumbnail-icon-wrap icon-' + backgrounds[profileCookie] + '">' +
+            '<div class="thumbnail-icon {iconCls}"></div>' +
+            '</div>' +
+            '<div class="thumbnail-text">{text}</div>' +
+            '</div>' +
             '</tpl>';
-        
+
         this.callParent();
     }
 });
-
-Ext.define('Dcs.main.ContentTabs', {
+Ext.define('App.main.ContentTabs', {
     extend: 'Ext.tab.Panel',
     xtype: 'contentTabs',
-    id:'contentTabsView',
+    id: 'contentTabsView',
     reference: 'contentTabsView',
-    width : '100%',
-    height : '100%',
+    width: '100%',
+    height: '100%',
     defaults: {
-    	bodyPadding: 10,
-    	bodyCls : 'dcs-panel-body',
+        bodyCls: 'App-panel-body',
         closable: true,
         layout: 'center',
-    	scrollable: true
+        scrollable: true,
     },
-    plugins: ['tabreorderer','tabclosemenu_zh'],
-    items : [
-			{
-				itemId : 'thumbnailsTab',
-				reference: 'thumbnailsTab',
-			    items : [{
-		        	selector: 'thumbnails',
-		        	xtype: 'thumbnails',
-		        	reference: 'thumbnails'
-		        }],
-		        closable: false,
-		        listeners: {
-		        	render: function(tab){
-			        	var navStore = Ext.StoreMgr.get('navigation');
-			            var node = navStore.getNodeById('all');
-		        		var thumbnailsStore = Ext.StoreMgr.get('Thumbnails');
-		                thumbnailsStore.removeAll();
-		                thumbnailsStore.add(node.childNodes);
-		                tab.setTitle(node.get('text'));
-		                tab.setIconCls(node.get('iconCls')); 
-		                tab.treeNode = node;
-		            }
-		        }
-			}  
-    ]
+    plugins: ['tabreorderer', 'tabclosemenu_zh'],
+    items: [{
+        itemId: 'thumbnailsTab',
+        reference: 'thumbnailsTab',
+        items: [{
+            selector: 'thumbnails',
+            xtype: 'thumbnails',
+            reference: 'thumbnails'
+        }],
+        closable: false,
+        listeners: {
+            render: function (tab) {
+                var navStore = Ext.StoreMgr.get('navigation');
+                var node = navStore.getNodeById('all');
+                var thumbnailsStore = Ext.StoreMgr.get('Thumbnails');
+                thumbnailsStore.removeAll();
+                thumbnailsStore.add(node.childNodes);
+                tab.setTitle(node.get('text'));
+                tab.setIconCls(node.get('iconCls'));
+                tab.treeNode = node;
+            }
+        }
+    }]
 });
+// var funPanel = Ext.getCmp(record.get('id')); //这里的id千万不要跟其他组件相同
+// if (!funPanel) {
+//     funPanel = mainView.add({
+//         id: record.get('id'),
+//         title: record.get('text'),
+//         closable: true,
+//         xtype: funInfo.funViewXtype
+//     });
+// } else {
+//     mainView.add(funPanel);
+// }
+// mainView.setActiveTab(funPanel);
 
-Ext.define('Dcs.main.TabCloseMenu', {
+Ext.define('App.main.TabCloseMenu', {
     extend: 'Ext.ux.TabCloseMenu',
     alias: 'plugin.tabclosemenu_zh',
-    closeTabText : '关闭当前',
-    closeOthersTabsText : '关闭其他',
-    closeAllTabsText : '关闭所有'
+    closeTabText: '关闭当前',
+    closeOthersTabsText: '关闭其他',
+    closeAllTabsText: '关闭所有'
 });

@@ -14,7 +14,9 @@
 			slave_url,
 			slave_username,
 			slave_password,
-			create_time
+			create_time,
+			source_type,
+			source_name
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			#{master_url},
@@ -23,7 +25,9 @@
 			#{slave_url},
 			#{slave_username},
 			#{slave_password},
-			now()
+			now(),
+			#{source_type},
+			#{source_name}
 		</trim>
 	</insert>
 
@@ -40,7 +44,9 @@
 			slave_url = #{slave_url},
 			slave_username = #{slave_username},
 			slave_password = #{slave_password},
-			modify_time = #{modify_time}
+			modify_time = #{modify_time},
+			source_type = #{source_type},
+			source_name = #{source_name}
 		where id = #{id} 
 	</update>
 
@@ -56,9 +62,57 @@
 		where id = #{id} 
 	</select>
 
+    <select id="queryTotalCount"
+		resultType="java.lang.Long">
+		select count(*) from data_source
+	</select>
+	
 	<select id="queryList"
 		resultType="com.shankephone.job.scheduling.regulation.model.DBDataSource">
-		select * from data_source order by create_time desc
+		select id,
+		master_url,
+		master_username,
+		master_password,
+		slave_url,
+		slave_username,
+		slave_password,
+		create_time,
+		modify_time,
+		source_type,
+		source_name
+		from data_source order by create_time desc limit #{start}, #{limit}
+	</select>
+	
+	<select id="queryCleanList"
+		resultType="com.shankephone.job.scheduling.regulation.model.DBDataSource">
+		select id,
+		master_url,
+		master_username,
+		master_password,
+		slave_url,
+		slave_username,
+		slave_password,
+		create_time,
+		modify_time,
+		source_type,
+		source_name
+		from data_source where source_type =1 order by create_time desc
+	</select>
+	
+	<select id="queryHistoryList"
+		resultType="com.shankephone.job.scheduling.regulation.model.DBDataSource">
+		select id,
+		master_url,
+		master_username,
+		master_password,
+		slave_url,
+		slave_username,
+		slave_password,
+		create_time,
+		modify_time,
+		source_type,
+		source_name
+		from data_source where source_type = 0 order by create_time desc 
 	</select>
 </mapper>
 

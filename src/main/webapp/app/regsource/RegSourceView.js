@@ -1,18 +1,34 @@
-Ext.define('Dcs.regsource.RegSourceView', {
+Ext.define('App.regsource.RegSourceView', {
 	extend : 'Ext.grid.Panel',
-	title : '数据库管理',
-	store : Ext.create('Dcs.regsource.RegSourceStore'),
-	controller : 'regSourceController',
+	requires : [
+		"App.regsource.RegSourceStore",
+		"App.regsource.RegSourceWindow",
+		"App.regsource.RegSourceController"
+    ],
+    controller : {
+    	xclass : "App.regsource.RegSourceController",
+    },
+	store : {
+		xclass : "App.regsource.RegSourceStore"
+	},
 	xtype : 'regsource',
 	id : 'regsource',
 	columns : [ {
-		xtype : 'rownumberer'
+		text: '序号',
+		xtype : 'rownumberer',
+		width: '10px',
+		align : 'center'
 	}, {
 		text : 'ID',
 		dataIndex : 'id',
 		align : 'left',
 		flex : 1,
 		hidden : true
+	}, {
+		text : '数据源名称',
+		dataIndex : 'source_name',
+		align : 'left',
+		flex : 1
 	}, {
 		text : '主库地址',
 		dataIndex : 'master_url',
@@ -44,6 +60,19 @@ Ext.define('Dcs.regsource.RegSourceView', {
 		align : 'left',
 		flex : 1
 	},{
+		text : '数据源类型',
+		dataIndex : 'source_type',
+		align : 'left',
+		flex : 1,
+		renderer:function(value,record){
+			if(value==0){
+				return "历史数据源";
+			}
+			if(value==1){
+				return "清理数据源";
+			}
+		}
+	},{
 		text : '创建时间',
 		dataIndex : 'create_time',
 		align : 'left',
@@ -57,12 +86,17 @@ Ext.define('Dcs.regsource.RegSourceView', {
 
 	} ],
 	fullscreen : true,
-	renderTo : Ext.getBody(),
 	selModel : {
 		selType : 'checkboxmodel',
-		mode : 'SINGLE'
+		mode : 'SINGLE',
+		allowDeselect: true
 
 	},
+    bbar: {
+        xtype: 'pagingtoolbar',
+        displayInfo: true,
+        plugins: 'ux-progressbarpager'
+    },
 	tbar : [ {
 		xtype : 'button',
 		text : '新增',

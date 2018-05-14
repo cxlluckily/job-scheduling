@@ -6,49 +6,85 @@
 
 	<insert id="insert"
 		parameterType="com.shankephone.job.scheduling.regulation.model.Regulation">
-		INSERT INTO regulation
+		INSERT INTO regulation 
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			source_id,
+			history_source_id,
 			name,
 			db_name,
 			table_name,
-			col_name,
-			col_value,
-			operator,
+			history_db_name,
+			history_table_name,
 			sql_txt,
+			check_sql,
+			check_history_sql,
 			create_time
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			#{source_id},
+			#{history_source_id},
 			#{name},
 			#{db_name},
 			#{table_name},
-			#{col_name},
-			#{col_value},
-			#{operator},
+			#{history_db_name},
+			#{history_table_name},
 			#{sql_txt},
+			#{check_sql},
+			#{check_history_sql},
 			now()
+		</trim>
+	</insert>
+	
+    <select id="queryMaxId"
+		resultType="java.lang.Long">
+		select CAST(max(id) AS SIGNED) as reg_id
+		from regulation 
+	</select>
+
+	<insert id="insertJob"
+		parameterType="com.shankephone.job.scheduling.regulation.model.JobRegRelation">
+		INSERT INTO job_reg_relation
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			job_id,
+			reg_id
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			#{id_job_setting},
+			#{reg_id}
 		</trim>
 	</insert>
 
 	<delete id="deleteById">
-		delete from regulation where id = #{id} 
+		delete from regulation where id = #{id} ;delete from job_reg_relation where reg_id=#{id}
 	</delete>
 
 	<update id="update"
 		parameterType="com.shankephone.job.scheduling.regulation.model.Regulation">
 		update regulation set 
 			source_id = #{source_id},
+			history_source_id = #{history_source_id},
 			name = #{name},
 			db_name = #{db_name},
 			table_name = #{table_name},
-			col_name = #{col_name},
-			col_value = #{col_value},
-			operator = #{operator},
+			history_db_name = #{history_db_name},
+			history_table_name = #{history_table_name},
 			sql_txt = #{sql_txt},
-			modify_time = #{modify_time}
-		where id = #{id} 
+			modify_time = now(),
+			check_sql = #{check_sql},
+			check_history_sql = #{check_history_sql}
+		where id = #{id};
+		delete from job_reg_relation where reg_id = #{id};
+		INSERT INTO job_reg_relation
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			job_id,
+			reg_id
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			#{id_job_setting},
+			#{id}
+		</trim>
 	</update>
+	
 
 	<select id="queryById"
 		resultType="com.shankephone.job.scheduling.regulation.model.Regulation">
@@ -57,9 +93,45 @@
 		where id = #{id} 
 	</select>
 
+    <select id="queryCountByDataSource"
+		resultType="java.lang.Long">
+		select count(*) from regulation 
+		WHERE source_id=#{dataSourceId} OR history_source_id=#{dataSourceId}
+	</select>
+    <select id="queryCountByJob"
+		resultType="java.lang.Long">
+		SELECT COUNT(*) FROM job_reg_relation WHERE reg_id=#{regId}
+	</select>
+	
+	<select id="queryTotalCount"
+		resultType="java.lang.Long">
+		select count(*) from regulation
+	</select>
+	
 	<select id="queryList"
 		resultType="com.shankephone.job.scheduling.regulation.model.Regulation">
-		select * from regulation order by create_time desc
+		select 
+		    a.id as id,
+		    a.source_id as source_id,
+			a.history_source_id as history_source_id,
+			a.name as name,
+			a.db_name as db_name,
+			a.table_name as table_name,
+			a.history_db_name as history_db_name,
+			a.history_table_name as history_table_name,
+			a.sql_txt as sql_txt,
+			a.check_sql as check_sql,
+			a.check_history_sql as check_history_sql,
+			a.create_time as create_time,
+			a.modify_time as modify_time,
+			c.job_name as job_name,
+			b.job_id id_job_setting
+        from regulation a 
+        left join job_reg_relation b 
+        on a.id =b.reg_id
+        left join job_setting c
+        on b.job_id = c.id
+         order by a.create_time desc limit #{start}, #{limit}
 	</select>
 </mapper>
 

@@ -1,14 +1,13 @@
-Ext.define('Dcs.main.GlobalController', {
+Ext.define('App.main.GlobalController', {
     extend: 'Ext.app.Controller',
-    alias: 'controller.global',
-    routes  : {
+    routes: {
         ':id': {
             action: 'handleRoute',
             before: 'beforeHandleRoute'
         }
     },
 
-    beforeHandleRoute: function(id, action) {
+    beforeHandleRoute: function (id, action) {
         var me = this,
             node = Ext.StoreMgr.get('navigation').getNodeById(id);
         if (node) {
@@ -18,7 +17,7 @@ Ext.define('Dcs.main.GlobalController', {
             Ext.Msg.alert(
                 '错误',
                 '您访问的页面不存在！',
-                function() {
+                function () {
                     me.redirectTo(me.getApplication().getDefaultToken());
                 }
             );
@@ -37,8 +36,8 @@ Ext.define('Dcs.main.GlobalController', {
         thumbnailsTab: '#thumbnailsTab',
         thumbnails: 'thumbnails'
     },
-    
-    handleRoute: function(id) {
+
+    handleRoute: function (id) {
         var me = this,
             navigationTree = me.getNavigationTree(),
             navigationBreadcrumb = me.getNavigationBreadcrumb(),
@@ -51,36 +50,36 @@ Ext.define('Dcs.main.GlobalController', {
             hasTree = navigationTree && navigationTree.isVisible();
         Ext.suspendLayouts();
         if (node.isLeaf()) {
-        	//简化模式
-        	if (!hasTree) {
-                contentTabs.items.each(function(item){
-                	if (item.getItemId() == 'thumbnailsTab') {
-                		return;
-                	}
-                	contentTabs.remove(item, true);
+            //简化模式
+            if (!hasTree) {
+                contentTabs.items.each(function (item) {
+                    if (item.getItemId() == 'thumbnailsTab') {
+                        return;
+                    }
+                    contentTabs.remove(item, true);
                 });
-        	}
-        	var tab = contentTabs.items.get(node.get('id'));
-    		if (!tab) {
-    			//修改-添加tab页面
-    			tab = this.addTabItem(tab,node);
-    		}
-        	contentTabs.setActiveTab(tab);
+            }
+            var tab = contentTabs.items.get(node.get('id'));
+            if (!tab) {
+                this.addTabItem(tab, node, contentTabs);
+            } else {
+            	contentTabs.setActiveTab(tab);
+            }
         } else {
-        	thumbnailsTab.treeNode = node;
-        	thumbnailsTab.setTitle(node.get('text'));
-    		thumbnailsTab.setIconCls(node.get('iconCls'));
-    		contentTabs.setActiveTab(thumbnailsTab);
-    		var thumbnailsStore = Ext.StoreMgr.get('Thumbnails');
+            thumbnailsTab.treeNode = node;
+            thumbnailsTab.setTitle(node.get('text'));
+            thumbnailsTab.setIconCls(node.get('iconCls'));
+            contentTabs.setActiveTab(thumbnailsTab);
+            var thumbnailsStore = Ext.StoreMgr.get('Thumbnails');
             thumbnailsStore.removeAll();
             thumbnailsStore.add(node.childNodes);
         }
-    	this.updateTitle(node);
-    	Ext.resumeLayouts(true);
+        this.updateTitle(node);
+        Ext.resumeLayouts(true);
         // Keep focus available and selections synchronized.
         // If navigation was through thumbnails, the view will have hidden and focus will go to document
         if (hasTree) {
-        	navigationTree.setSelection(node);
+            navigationTree.setSelection(node);
             if (node.isRoot()) {
                 navigationTree.ensureVisible(0, {
                     focus: true
@@ -96,44 +95,22 @@ Ext.define('Dcs.main.GlobalController', {
             navigationBreadcrumb.child(':last').focus();
         }
     },
-    
-    addTabItem : function(tab,node) {
-    	var me = this;
-    	var contentTabs =  me.getContentTabsView();
-    	var itemId = node.get('id');
-    	var t;
-		if(itemId == 'reglist'){
-			t = Ext.create('Dcs.reg.RegListView');
-			tab = contentTabs.add(t);
-		} else if(itemId == 'registryCenterList'){
-			t = Ext.create('Dcs.job.RegistryCenterListView');
-			tab = contentTabs.add(t);
-		} else if(itemId == 'dataSourceList'){
-			t = Ext.create('Dcs.job.DataSourceListView');
-			tab = contentTabs.add(t);
-		} else if(itemId == 'regsource'){
-			t = Ext.create('Dcs.regsource.RegSourceView');
-			tab = contentTabs.add(t);
-		} else {
-			tab = contentTabs.add({
-    			itemId : node.get('id'),
-    	        title: node.get('text'),
-    	        iconCls: node.get('iconCls'),
-    	        items : [this.createTabItem(node)]
-    	    });
-		}
-		return tab;
+
+    addTabItem: function (tab, node, contentTabs) {
+    	 var tabItem = node.get('xclass');
+		 Ext.require(tabItem, function() {
+		     var tab = contentTabs.add({
+		            itemId: node.get('id'),
+		            title: node.get('text'),
+		            layout: 'fit',
+		            iconCls: node.get('iconCls'),
+		            items: [Ext.create(tabItem)]
+		        });
+		     contentTabs.setActiveTab(tab);
+		 });
     },
-    
-    createTabItem : function(node) {
-    	return {
-    		xtype: 'panel',
-    		html : node.get('text'),
-    		bodyCls : 'dcs-panel-body'
-    	}
-    },
-    
-    updateTitle: function(node) {
+
+    updateTitle: function (node) {
         var text = node.get('text');
         document.title = document.title.split(' - ')[0] + ' - ' + text;
     }

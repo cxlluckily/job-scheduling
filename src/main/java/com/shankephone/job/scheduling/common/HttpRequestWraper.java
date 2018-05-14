@@ -3,7 +3,6 @@ package com.shankephone.job.scheduling.common;
 import javax.servlet.http.HttpServletRequest;
 
 import com.alibaba.fastjson.JSONObject;
-import com.shankephone.job.scheduling.regulation.model.BaseModel;
 
 public class HttpRequestWraper{
 	

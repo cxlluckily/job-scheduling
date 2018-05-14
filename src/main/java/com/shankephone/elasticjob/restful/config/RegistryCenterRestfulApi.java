@@ -17,13 +17,13 @@
 
 package com.shankephone.elasticjob.restful.config;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -31,9 +31,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dangdang.ddframe.job.lite.lifecycle.internal.reg.RegistryCenterFactory;
 import com.dangdang.ddframe.job.reg.exception.RegException;
@@ -47,18 +47,32 @@ import com.shankephone.elasticjob.util.SessionRegistryCenterConfiguration;
  *
  * @author caohao
  */
+@Component
 @Path("/registry-center")
 public final class RegistryCenterRestfulApi {
     
     public static final String REG_CENTER_CONFIG_KEY = "reg_center_config_key";
-    
+    @Resource
     private RegistryCenterService registryCenterService;
     
-    public RegistryCenterRestfulApi(){
-    	ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
-    	registryCenterService = (RegistryCenterService)applicationContext.getBean("registryCenterService");
+    @PostConstruct
+    public String init() {
+    	System.out.println("------------------------------初始化注册中心！"); 
+    	Optional<RegistryCenter> opt = registryCenterService.loadActivated();
+    	JSONObject json = new JSONObject();
+    	if(opt.isPresent()){
+    		RegistryCenter rc = opt.get();
+    		boolean isConnected = setRegistryCenterNameToSession(rc);
+        	registryCenterService.updateActivated(rc.getId());
+        	if(isConnected) {
+        		json.put("success", true);
+        	} else {
+        		json.put("success", false);
+        		throw new RuntimeException("注册中心初始化失败！！");
+        	}
+    	}
+        return json.toJSONString();
     }
-    
     
     /**
      * 判断是否存在已连接的注册中心配置.
@@ -83,13 +97,27 @@ public final class RegistryCenterRestfulApi {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<RegistryCenter> load(final @Context HttpServletRequest request) {
+    public String load(final @Context HttpServletRequest request) {
     	Optional<RegistryCenter> regCenterConfig = registryCenterService.loadActivated();
         if (regCenterConfig.isPresent()) {
-            setRegistryCenterNameToSession(regCenterConfig.get(), request.getSession());
+            setRegistryCenterNameToSession(regCenterConfig.get());
         }
-        List<RegistryCenter> list = registryCenterService.loadAll();
-        return list;
+        String start = request.getParameter("start");
+    	String limit = request.getParameter("limit");
+        if(start == null || "".equals(start)){
+        	start = "0";
+        }
+        if(limit == null || "".equals(limit)){
+        	limit = "10";
+        }
+        
+        List<RegistryCenter> list = registryCenterService.loadAll(Integer.parseInt(start), Integer.parseInt(limit));
+        long count = registryCenterService.queryTotalCount();
+        JSONArray array = JSONArray.parseArray(JSONArray.toJSONString(list));
+        JSONObject json = new JSONObject();
+        json.put("list", array);
+        json.put("totalCount", count);
+        return json.toJSONString();
     }
     
     /**
@@ -130,18 +158,42 @@ public final class RegistryCenterRestfulApi {
     @Path("/connect")
     public String connect(final RegistryCenter config, final @Context HttpServletRequest request) {
     	RegistryCenter rc = registryCenterService.load(config.getId());
-    	boolean isConnected = setRegistryCenterNameToSession(rc, request.getSession());
+    	boolean isConnected = setRegistryCenterNameToSession(rc);
     	registryCenterService.updateActivated(config.getId());
         JSONObject json = new JSONObject();
         json.put("success", isConnected);
     	return json.toJSONString();
     }
     
-    private boolean setRegistryCenterNameToSession(final RegistryCenter regCenterConfig, final HttpSession session) {
+    /**
+     * 设置全局级别的注册中心
+     * @param regCenterConfig
+     * @return
+     */
+    private boolean setRegistryCenterNameToSession(final RegistryCenter regCenterConfig) {
+    	RegistryCenter registryCenter = registryCenterService.load(regCenterConfig.getId());
+        try {
+            RegistryCenterFactory.createCoordinatorRegistryCenter(regCenterConfig.getZklist(), regCenterConfig.getNamespace(), Optional.fromNullable(regCenterConfig.getDigest()));
+            //生命周期设置
+            SessionRegistryCenterConfiguration.setRegistryCenterConfiguration(registryCenter);
+        } catch (final RegException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 设置会话级别的注册中心
+     * @param regCenterConfig
+     * @param session
+     * @return
+     */
+	private boolean setRegistryCenterNameToSession(final RegistryCenter regCenterConfig, final HttpSession session) {
     	RegistryCenter registryCenter = registryCenterService.load(regCenterConfig.getId());
     	session.setAttribute(REG_CENTER_CONFIG_KEY, registryCenter);
         try {
             RegistryCenterFactory.createCoordinatorRegistryCenter(regCenterConfig.getZklist(), regCenterConfig.getNamespace(), Optional.fromNullable(regCenterConfig.getDigest()));
+            //生命周期设置
             SessionRegistryCenterConfiguration.setRegistryCenterConfiguration((RegistryCenter) session.getAttribute(REG_CENTER_CONFIG_KEY));
         } catch (final RegException ex) {
             return false;

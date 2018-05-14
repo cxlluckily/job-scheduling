@@ -1,4 +1,4 @@
-Ext.define('Dcs.main.NavTreeView', {
+Ext.define('App.main.NavTreeView', {
     extend: 'Ext.tree.Panel',
 
     xtype: 'navigation-tree',

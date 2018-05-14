@@ -7,11 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>oms</title>
     <style type="text/css">
+    	body {
+    		overflow: hidden;
+    	}
     	#loading {
 			position: absolute;
 			top: 50%;
 			width: 100%;
-			margin-top: -70px
+			margin-top: -70px;
 		}
 		
 		#loading .title {

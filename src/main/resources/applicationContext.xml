@@ -3,12 +3,26 @@
 	xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation=
 	"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
 	 http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
-	 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
-
+	 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+	 http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+	 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd">
+	 
 	<context:component-scan base-package="com.shankephone.*"/>
+	
+	<bean id="contextAccessor" class="com.shankephone.job.scheduling.common.ContextAccessor"/>
+	
+	<bean id="propertyAccessor" class="com.shankephone.job.scheduling.common.PropertyAccessor">
+		<property name="fileLocations">
+			<array>
+				<value>classpath:application.properties</value>
+			</array>
+		</property>
+	</bean>
 	
 	<bean id="propertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -69,6 +83,42 @@
 		<property name="sqlSessionFactoryBeanName" value="sqlMapClient" />
 	</bean>
 	
+	<!-- 事务配置开始 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource" ref="mysql_dataSource"/>
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="insert*"/>
+			<tx:method name="delete*"/>
+			<tx:method name="update*"/>
+			<tx:method name="save*"/>
+			<tx:method name="add*"/>
+			<tx:method name="*" read-only="true"/>
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:advisor pointcut="execution(* com.shankephone.*.service.*.*(..))" advice-ref="txAdvice"/>
+	</aop:config>
+	<!-- 事务配置结束 -->
+	
+	
+	<!-- SpringMVC上传文件时，需要配置MultipartResolver处理器 --> 
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> 
+       	<!-- 指定所上传文件的总大小不能超过200000KB。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 --> 
+        <property name="maxUploadSize" value="200000000"/> 
+    </bean> 
+    
+    <!-- 该异常是SpringMVC在检查上传的文件信息时抛出来的，而且此时还没有进入到Controller方法中 --> 
+    <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver"> 
+        <property name="exceptionMappings"> 
+            <props> 
+                <!-- 遇到MaxUploadSizeExceededException异常时，自动跳转到/WEB-INF/jsp/error/error.jsp页面 --> 
+                <prop key="org.springframework.web.multipart.MaxUploadSizeExceededException">error/error</prop> 
+            </props> 
+        </property> 
+    </bean>
+    	
 	<import resource="applicationContext-servlet.xml"/>
 	
 </beans>

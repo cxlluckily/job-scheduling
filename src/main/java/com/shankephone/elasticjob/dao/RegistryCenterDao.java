@@ -16,12 +16,14 @@ public interface RegistryCenterDao {
 
 	public Integer deleteById(@Param("id")Long id);
 
-	public List<RegistryCenter> queryList();  
+	public List<RegistryCenter> queryList(@Param("start")Integer start, @Param("limit")Integer limit);  
 	
 	public RegistryCenter loadActivated();
 
 	public RegistryCenter find(@Param("name")String name);
 
-	public void updateActivated(@Param("id")Long id); 
+	public void updateActivated(@Param("id")Long id);
+
+	public long queryTotalCount(); 
 
 }

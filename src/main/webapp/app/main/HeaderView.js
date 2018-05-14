@@ -1,8 +1,8 @@
-Ext.define('Dcs.main.HeaderView', {
+Ext.define('App.main.HeaderView', {
 	extend : 'Ext.container.Container',
 	xtype : 'appHeader',
 	id : 'app-header',
-	title : '数据清理系统',
+	title : '作业管理系统',
 	height : 52,
 	layout : {
 		type : 'hbox',

@@ -24,9 +24,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -34,7 +36,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dangdang.ddframe.job.event.rdb.JobEventRdbSearch;
 import com.dangdang.ddframe.job.event.rdb.JobEventRdbSearch.Condition;
 import com.dangdang.ddframe.job.event.rdb.JobEventRdbSearch.Result;
@@ -43,7 +47,6 @@ import com.dangdang.ddframe.job.event.type.JobStatusTraceEvent;
 import com.google.common.base.Strings;
 import com.shankephone.elasticjob.model.EventTraceDataSource;
 import com.shankephone.elasticjob.service.EventTraceDataSourceConfigurationService;
-import com.shankephone.elasticjob.service.impl.EventTraceDataSourceServiceImpl;
 import com.shankephone.elasticjob.util.SessionEventTraceDataSourceConfiguration;
 
 /**
@@ -51,12 +54,13 @@ import com.shankephone.elasticjob.util.SessionEventTraceDataSourceConfiguration;
  *
  * @author zhangxinguo
  */
+@Component
 @Path("/event-trace")
 public final class EventTraceHistoryRestfulApi {
     
-    private EventTraceDataSource eventTraceDataSourceConfiguration = SessionEventTraceDataSourceConfiguration.getEventTraceDataSourceConfiguration();
     
-    private EventTraceDataSourceConfigurationService eventTraceDataSourceConfigurationService = new EventTraceDataSourceServiceImpl();
+    @Resource
+    private EventTraceDataSourceConfigurationService eventTraceDataSourceConfigurationService;
     
     /**
      * 查询作业执行事件.
@@ -67,14 +71,15 @@ public final class EventTraceHistoryRestfulApi {
      */
     @GET
     @Path("/execution")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Result<JobExecutionEvent> findJobExecutionEvents(@Context final UriInfo uriInfo) throws ParseException {
-        if (!eventTraceDataSourceConfigurationService.loadActivated().isPresent()) {
-            return new Result<>(0, new ArrayList<JobExecutionEvent>());
+    public String findJobExecutionEvents(@Context final UriInfo uriInfo) throws ParseException {
+    	JSONObject json = new JSONObject();
+    	if (!eventTraceDataSourceConfigurationService.loadActivated().isPresent()) {
+            return json.toJSONString();
         }
         JobEventRdbSearch jobEventRdbSearch = new JobEventRdbSearch(setUpEventTraceDataSource());
-        return jobEventRdbSearch.findJobExecutionEvents(buildCondition(uriInfo, new String[]{"jobName", "ip", "isSuccess"}));
+        Result<JobExecutionEvent> result = jobEventRdbSearch.findJobExecutionEvents(buildCondition(uriInfo, new String[]{"jobName", "ip", "isSuccess","startTime","endTime"}));
+        json = JSONObject.parseObject(JSONObject.toJSONString(result));
+        return json.toJSONString();
     }
     
     /**
@@ -84,7 +89,7 @@ public final class EventTraceHistoryRestfulApi {
      * @return 运行痕迹事件结果集
      * @throws ParseException 解析异常
      */
-    @GET
+    @POST
     @Path("/status")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -93,11 +98,12 @@ public final class EventTraceHistoryRestfulApi {
             return new Result<>(0, new ArrayList<JobStatusTraceEvent>());
         }
         JobEventRdbSearch jobEventRdbSearch = new JobEventRdbSearch(setUpEventTraceDataSource());
-        return jobEventRdbSearch.findJobStatusTraceEvents(buildCondition(uriInfo, new String[]{"jobName", "source", "executionType", "state"}));
+        return jobEventRdbSearch.findJobStatusTraceEvents(buildCondition(uriInfo, new String[]{"jobName", "source", "executionType", "state","startTime","endTime"}));
     }
     
     private DataSource setUpEventTraceDataSource() {
         BasicDataSource result = new BasicDataSource();
+        EventTraceDataSource eventTraceDataSourceConfiguration = SessionEventTraceDataSourceConfiguration.getEventTraceDataSourceConfiguration();
         result.setDriverClassName(eventTraceDataSourceConfiguration.getDriver());
         result.setUrl(eventTraceDataSourceConfiguration.getUrl());
         result.setUsername(eventTraceDataSourceConfiguration.getUsername());

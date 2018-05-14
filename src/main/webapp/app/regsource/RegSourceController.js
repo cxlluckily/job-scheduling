@@ -1,4 +1,4 @@
-Ext.define('Dcs.regsource.RegSourceController', {
+Ext.define('App.regsource.RegSourceController', {
 	extend : 'Ext.app.ViewController',
 	alias : 'controller.regSourceController',
 	control : {
@@ -18,6 +18,15 @@ Ext.define('Dcs.regsource.RegSourceController', {
 	
 	deleteRegSource : function(btn){
 		var record = Ext.ComponentQuery.query('regsource')[0].getSelection()[0];
+		if(!record) {
+			Ext.Msg.show({
+			    title:'提示',
+			    message: '请选择一条记录进行删除！',
+			    buttons: Ext.Msg.OK,
+			    icon: Ext.Msg.INFO
+			});
+			return;
+		}
 		var id = record.data.id;
 		Ext.Msg.confirm('提示信息', '确定要删除吗？', function(c){
 			if(c == 'yes'){
@@ -28,15 +37,33 @@ Ext.define('Dcs.regsource.RegSourceController', {
 					success : function(response, opts) {
 						var result = Ext.decode(response.responseText);
 						if(result.success){
-							Ext.Msg.alert('提示信息：', '删除成功！');
+							var regsource = Ext.ComponentQuery.query('regsource');
+							regsource[0].getStore().reload();
+							Ext.Msg.show({
+							    title:'提示',
+							    message: '删除成功！',
+							    buttons: Ext.Msg.OK,
+							    icon: Ext.Msg.INFO
+							});
+						}else{
+							Ext.Msg.show({
+							    title:'警告',
+							    message: result.msg,
+							    buttons: Ext.Msg.OK,
+							    icon: Ext.Msg.WARNING
+							});
 						}
-						var regsource = Ext.ComponentQuery.query('regsource');
-						regsource[0].getStore().reload();
 					},
 
 					failure : function(response, opts) {
 						console.log('server-side failure with status code '
 								+ response.status);
+						Ext.Msg.show({
+						    title:'错误',
+						    message: response,
+						    buttons: Ext.Msg.OK,
+						    icon: Ext.Msg.error
+						});
 					}
 				});
 			}
@@ -46,6 +73,9 @@ Ext.define('Dcs.regsource.RegSourceController', {
 	saveRegSource : function(btn) {
 		var me = this;
 		var form = btn.up('window').down('form');
+		if(!form.getForm().isValid()) { // 验证表单 , 如果为空, 不让发送请求
+			return;
+		}
 		var values = form.getValues();
 		var params = {params:Ext.encode(values)};
 		var url = '';
@@ -64,36 +94,65 @@ Ext.define('Dcs.regsource.RegSourceController', {
 				var result = Ext.decode(response.responseText);
 				if(result.success){
 					if(viewAction == 'add'){
-						Ext.Msg.alert('提示信息：', '保存成功！');
+						Ext.Msg.show({
+						    title:'提示',
+						    message: '保存成功！',
+						    buttons: Ext.Msg.OK,
+						    icon: Ext.Msg.INFO
+						});
 					}
 					if(viewAction == 'update'){
-						Ext.Msg.alert('提示信息：', '修改成功！');
+						Ext.Msg.show({
+						    title:'提示',
+						    message: '修改成功！',
+						    buttons: Ext.Msg.OK,
+						    icon: Ext.Msg.INFO
+						});
 					}
-					
+					form.up('window').close();
+					var regsource = Ext.ComponentQuery.query('regsource');
+					regsource[0].getStore().reload();
+				}else{
+					Ext.Msg.show({
+					    title:'提示',
+					    message: result.msg,
+					    buttons: Ext.Msg.OK,
+					    icon: Ext.Msg.INFO
+					});
 				}
-				form.up('window').close();
-				var regsource = Ext.ComponentQuery.query('regsource');
-				regsource[0].getStore().reload();
-				form.reset();
 			},
 
 			failure : function(response, opts) {
 				console.log('server-side failure with status code '
 						+ response.status);
+				Ext.Msg.show({
+				    title:'错误',
+				    message: response,
+				    buttons: Ext.Msg.OK,
+				    icon: Ext.Msg.error
+				});
 			}
 		});
 	},
 	clickAddBtnSource : function(btn) {
-		var window = Ext.create('Dcs.regsource.RegSourceWindow',{title:'新增', viewAction:'add'});
-		window.down('form').reset();
+		var window = Ext.create('App.regsource.RegSourceWindow',{title:'新增', viewAction:'add'});
 		window.show();
 	},
 	
 	clickUpdateBtnSource : function(btn) {
 		var record = Ext.ComponentQuery.query('regsource')[0].getSelection()[0];
-		var window = Ext.create('Dcs.regsource.RegSourceWindow',{title:'修改', viewAction:'update'});
-		window.down('form').getForm().setValues(record.data);
-		window.show();
+		if(record){
+			var window = Ext.create('App.regsource.RegSourceWindow',{title:'修改', viewAction:'update'});
+			window.down('form').getForm().setValues(record.data);
+			window.show();
+		}else{
+			Ext.Msg.show({
+			    title:'提示',
+			    message: '请选择一条记录进行修改！',
+			    buttons: Ext.Msg.OK,
+			    icon: Ext.Msg.INFO
+			});
+		}
 	}
 	
 });

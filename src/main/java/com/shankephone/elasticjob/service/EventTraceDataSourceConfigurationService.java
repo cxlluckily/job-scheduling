@@ -17,6 +17,8 @@
 
 package com.shankephone.elasticjob.service;
 
+import java.util.List;
+
 import com.google.common.base.Optional;
 import com.shankephone.elasticjob.model.EventTraceDataSource;
 import com.shankephone.elasticjob.model.EventTraceDataSourceConfigurations;
@@ -33,24 +35,16 @@ public interface EventTraceDataSourceConfigurationService {
      *
      * @return 全部事件追踪数据源配置
      */
-    EventTraceDataSourceConfigurations loadAll();
+    List<EventTraceDataSource> loadAll();
     
     /**
      * 读取事件追踪数据源配置.
      * 
-     * @param name 配置名称
+     * @param id 配置ID
      * @return 事件追踪数据源配置
      */
-    EventTraceDataSource load(String name);
+    EventTraceDataSource load(Long id);
     
-    /**
-     * 查找事件追踪数据源配置.
-     *
-     * @param name 配置名称
-     * @param configs 全部事件追踪数据源配置
-     * @return 事件追踪数据源配置
-     */
-    EventTraceDataSource find(final String name, final EventTraceDataSourceConfigurations configs);
     
     /**
      * 读取已连接的事件追踪数据源配置.
@@ -70,7 +64,13 @@ public interface EventTraceDataSourceConfigurationService {
     /**
      * 删除事件追踪数据源配置.
      *
-     * @param name 配置名称
+     * @param id 配置名称
      */
-    void delete(String name);
+    boolean delete(Long id);
+
+    /**
+     * 更新活动的数据源配置
+     * @param id
+     */
+	void updateActivated(Long id);
 }

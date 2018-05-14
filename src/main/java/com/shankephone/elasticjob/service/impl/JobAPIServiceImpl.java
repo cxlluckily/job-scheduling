@@ -61,7 +61,10 @@ public final class JobAPIServiceImpl implements JobAPIService {
     }
     
     @Override
-    public ServerStatisticsAPI getServerStatisticsAPI() {
+    public ServerStatisticsAPI getServerStatisticsAPI(){
+    	if(SessionRegistryCenterConfiguration.getRegistryCenterConfiguration()==null){
+    		return null;
+    	}
         RegistryCenter regCenterConfig = SessionRegistryCenterConfiguration.getRegistryCenterConfiguration();
         return JobAPIFactory.createServerStatisticsAPI(regCenterConfig.getZklist(), regCenterConfig.getNamespace(), Optional.fromNullable(regCenterConfig.getDigest()));
     }

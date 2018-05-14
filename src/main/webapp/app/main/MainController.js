@@ -1,7 +1,5 @@
-Ext.define('Dcs.main.MainController', {
+Ext.define('App.main.MainController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.main',
-
     control: {
         'navigation-tree': {
             selectionchange: 'onTreeNavSelectionChange'
@@ -109,7 +107,7 @@ Ext.define('Dcs.main.MainController', {
     	var viewType = record.getId();
     	var reglist = Ext.ComponentQuery.query(viewType);
     	if(viewType == 'reglist'){
-    		var t = Ext.create('Dcs.reg.RegListView',{renderTo : tabpanel.getId()});
+    		var t = Ext.create('App.reg.RegListView',{renderTo : tabpanel.getId()});
     		tabpanel.add(t);
         } /*else {
         	this.redirectTo(record.getId());

@@ -16,6 +16,12 @@ public interface DBDataSourceDao {
 
 	public Integer deleteById(@Param("id")String id);
 
-	public List<DBDataSource> queryList();  
+	public List<DBDataSource> queryList(@Param("start")Integer start, @Param("limit")Integer limit);  
+	
+	public List<DBDataSource> queryCleanList();
+	
+	public List<DBDataSource> queryHistoryList();
+	
+	public long queryTotalCount(); 
 
 }

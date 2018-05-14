@@ -19,10 +19,9 @@ package com.shankephone.elasticjob.restful.config;
 
 import java.util.Collection;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -30,11 +29,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.springframework.stereotype.Component;
+
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Optional;
 import com.shankephone.elasticjob.model.EventTraceDataSource;
 import com.shankephone.elasticjob.model.EventTraceDataSourceFactory;
 import com.shankephone.elasticjob.service.EventTraceDataSourceConfigurationService;
-import com.shankephone.elasticjob.service.impl.EventTraceDataSourceServiceImpl;
 import com.shankephone.elasticjob.util.SessionEventTraceDataSourceConfiguration;
 
 /**
@@ -42,12 +43,14 @@ import com.shankephone.elasticjob.util.SessionEventTraceDataSourceConfiguration;
  *
  * @author caohao
  */
+@Component
 @Path("/data-source")
 public final class EventTraceDataSourceRestfulApi {
     
     public static final String DATA_SOURCE_CONFIG_KEY = "data_source_config_key";
     
-    private EventTraceDataSourceConfigurationService eventTraceDataSourceConfigurationService = new EventTraceDataSourceServiceImpl();
+    @Resource
+    private EventTraceDataSourceConfigurationService eventTraceDataSourceConfigurationService;
     
     /**
      * 判断是否存在已连接的事件追踪数据源配置.
@@ -57,8 +60,11 @@ public final class EventTraceDataSourceRestfulApi {
      */
     @GET
     @Path("/activated")
-    public boolean activated(final @Context HttpServletRequest request) {
-        return eventTraceDataSourceConfigurationService.loadActivated().isPresent();
+    public String activated(final @Context HttpServletRequest request) {
+        boolean result = eventTraceDataSourceConfigurationService.loadActivated().isPresent();
+        JSONObject json = new JSONObject();
+        json.put("success", result);
+        return json.toJSONString();
     }
     
     /**
@@ -74,7 +80,7 @@ public final class EventTraceDataSourceRestfulApi {
         if (dataSourceConfig.isPresent()) {
             setDataSourceNameToSession(dataSourceConfig.get(), request.getSession());
         }
-        return eventTraceDataSourceConfigurationService.loadAll().getEventTraceDataSourceConfiguration();
+        return eventTraceDataSourceConfigurationService.loadAll();
     }
     
     /**
@@ -84,10 +90,12 @@ public final class EventTraceDataSourceRestfulApi {
      * @return 是否添加成功
      */
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public boolean add(final EventTraceDataSource config) {
-        return eventTraceDataSourceConfigurationService.add(config);
+    @Path("/add")
+    public String add(final EventTraceDataSource config) {
+        boolean result = eventTraceDataSourceConfigurationService.add(config);
+        JSONObject json = new JSONObject();
+        json.put("success", result);
+        return json.toJSONString();
     }
     
     /**
@@ -95,10 +103,17 @@ public final class EventTraceDataSourceRestfulApi {
      * 
      * @param config 事件追踪数据源配置
      */
-    @DELETE
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void delete(final EventTraceDataSource config) {
-        eventTraceDataSourceConfigurationService.delete(config.getName());
+    @POST
+    @Path("/delete")
+    public String delete(final EventTraceDataSource config) {
+    	JSONObject json = new JSONObject();
+        try {
+        	eventTraceDataSourceConfigurationService.delete(config.getId());
+			json.put("success", true);
+		} catch (Exception e) {
+			json.put("success", false);
+		}
+        return json.toJSONString();
     }
     
     /**
@@ -110,10 +125,11 @@ public final class EventTraceDataSourceRestfulApi {
      */
     @POST
     @Path("/connectTest")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public boolean connectTest(final EventTraceDataSource config, final @Context HttpServletRequest request) {
-        return setDataSourceNameToSession(config, request.getSession());
+    public String connectTest(final EventTraceDataSource config, final @Context HttpServletRequest request) {
+        boolean result = setDataSourceNameToSession(config, request.getSession());
+        JSONObject json = new JSONObject();
+        json.put("success", result);
+        return json.toJSONString();
     }
     
     /**
@@ -125,14 +141,13 @@ public final class EventTraceDataSourceRestfulApi {
      */
     @POST
     @Path("/connect")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public boolean connect(final EventTraceDataSource config, final @Context HttpServletRequest request) {
-        boolean isConnected = setDataSourceNameToSession(eventTraceDataSourceConfigurationService.find(config.getName(), eventTraceDataSourceConfigurationService.loadAll()), request.getSession());
-        if (isConnected) {
-            eventTraceDataSourceConfigurationService.load(config.getName());
-        }
-        return isConnected;
+    public String connect(final EventTraceDataSource config, final @Context HttpServletRequest request) {
+    	EventTraceDataSource rc = eventTraceDataSourceConfigurationService.load(config.getId());
+    	boolean isConnected = setDataSourceNameToSession(rc, request.getSession());
+    	eventTraceDataSourceConfigurationService.updateActivated(config.getId());
+        JSONObject json = new JSONObject();
+        json.put("success", isConnected);
+    	return json.toJSONString();
     }
     
     private boolean setDataSourceNameToSession(final EventTraceDataSource dataSourceConfig, final HttpSession session) {
@@ -140,10 +155,12 @@ public final class EventTraceDataSourceRestfulApi {
         try {
             EventTraceDataSourceFactory.createEventTraceDataSource(dataSourceConfig.getDriver(), dataSourceConfig.getUrl(), 
                     dataSourceConfig.getUsername(), Optional.fromNullable(dataSourceConfig.getPassword()));
+            //生命周期设置
             SessionEventTraceDataSourceConfiguration.setDataSourceConfiguration((EventTraceDataSource) session.getAttribute(DATA_SOURCE_CONFIG_KEY));
         // CHECKSTYLE:OFF
         } catch (final Exception ex) {
         // CHECKSTYLE:ON
+        	ex.printStackTrace();
             return false;
         }
         return true;

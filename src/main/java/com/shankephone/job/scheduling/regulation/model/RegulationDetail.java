@@ -1,13 +1,15 @@
 package com.shankephone.job.scheduling.regulation.model;
 
+import com.shankephone.job.scheduling.common.BaseModel;
+
 public class RegulationDetail extends BaseModel{
 	private static final long serialVersionUID = 1L;
 	private String id;
-	private String regulation_id;
+	private String reg_id;
 	private String col_name;
 	private String col_value;
 	private String operator;
-	private String col_type;
+	private String type;
 	
 	
 	public String getId() {
@@ -15,12 +17,6 @@ public class RegulationDetail extends BaseModel{
 	}
 	public void setId(String id) {
 		this.id = id;
-	}
-	public String getRegulation_id() {
-		return regulation_id;
-	}
-	public void setRegulation_id(String regulation_id) {
-		this.regulation_id = regulation_id;
 	}
 	public String getCol_name() {
 		return col_name;
@@ -40,11 +36,17 @@ public class RegulationDetail extends BaseModel{
 	public void setOperator(String operator) {
 		this.operator = operator;
 	}
-	public String getCol_type() {
-		return col_type;
+	public String getReg_id() {
+		return reg_id;
 	}
-	public void setCol_type(String col_type) {
-		this.col_type = col_type;
+	public void setReg_id(String reg_id) {
+		this.reg_id = reg_id;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
 	}
 	
 	

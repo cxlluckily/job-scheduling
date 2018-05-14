@@ -6,22 +6,28 @@
 
 	<insert id="insert"
 		parameterType="com.shankephone.job.scheduling.regulation.model.RegulationDetail">
-		INSERT INTO regulation_detail
+		INSERT INTO regulation_detail 
 		<trim prefix="(" suffix=")" suffixOverrides=",">
-			regulation_id,
+			reg_id,
 			col_name,
 			col_value,
 			operator,
-			col_type
+			type
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
-			#{regulation_id},
+			#{reg_id},
 			#{col_name},
 			#{col_value},
 			#{operator},
-			#{col_type}
+			#{type}
 		</trim>
 	</insert>
+	
+    <select id="queryMaxId"
+		resultType="java.lang.Long">
+		select CAST(max(id) AS SIGNED) as regDetail_id
+		from regulation_detail 
+	</select>
 
 	<delete id="deleteById">
 		delete from regulation_detail where id = #{id} 
@@ -30,29 +36,27 @@
 	<update id="update"
 		parameterType="com.shankephone.job.scheduling.regulation.model.RegulationDetail">
 		update regulation_detail set 
-			regulation_id = #{regulation_id},
+			reg_id = #{reg_id},
 			col_name = #{col_name},
 			col_value = #{col_value},
 			operator = #{operator},
-			col_type = #{col_type}
-		where id = #{id} 
+			type = #{type}
+		where id = #{id}
 	</update>
+	
 
 	<select id="queryById"
 		resultType="com.shankephone.job.scheduling.regulation.model.RegulationDetail">
-		select regulation_id,
-			col_name,
-			col_value,
-			operator,
-			col_type
+		select *
 		from regulation_detail
 		where id = #{id} 
 	</select>
 
-	<select id="queryList"
-		resultType="com.shankephone.job.scheduling.regulation.model.RegulationDetail">
-		select * from regulation_detail 
+	<select id="queryCountById"
+		resultType="java.lang.Long">
+		select count(*) from regulation_detail where id=#{id}
 	</select>
+	
 </mapper>
 
 

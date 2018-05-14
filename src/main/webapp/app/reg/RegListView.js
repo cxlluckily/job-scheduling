@@ -1,12 +1,23 @@
-Ext.define('Dcs.reg.RegListView', {
+Ext.define('App.reg.RegListView', {
 	extend : 'Ext.grid.Panel',
-	title : 'SQL规则管理',
-	store : Ext.create('Dcs.reg.RegListStore'),
-	controller : 'regController',
+	store : {
+		xclass : "App.reg.RegStore"
+	},
+	controller : {
+		xclass : "App.reg.RegController"
+	},
 	xtype : 'reglist',
 	id : 'reglist',
+	requires : [
+		"App.reg.RegStore",
+		"App.reg.RegController",
+		"App.reg.RegWindow"
+    ],
 	columns : [ {
-		xtype : 'rownumberer'
+		text: '序号',
+		xtype : 'rownumberer',
+		width: '10px',
+		align : 'center'
 	}, {
 		text : 'ID',
 		dataIndex : 'id',
@@ -14,21 +25,66 @@ Ext.define('Dcs.reg.RegListView', {
 		flex : 1,
 		hidden : true
 	}, {
-		text : 'SOURCE_ID',
+		text : '清理数据源id',
 		dataIndex : 'source_id',
 		align : 'left',
 		flex : 1,
 		hidden : true
+	},  {
+		text : '清理数据库名称',
+		dataIndex : 'db_name',
+		align : 'left',
+		flex : 1,
+		hidden : true
 	}, {
-		text : '规则描述',
+		text : '历史数据源id',
+		dataIndex : 'history_source_id',
+		align : 'left',
+		flex : 1,
+		hidden : true
+	}, {
+		text : '历史数据库名称',
+		dataIndex : 'history_db_name',
+		align : 'left',
+		flex : 1,
+		hidden : true
+	}, {
+		text : '规则名称',
 		dataIndex : 'name',
 		align : 'left',
 		flex : 1
 	}, {
-		text : '执行语句',
+		text : '清理源校验SQL',
+		dataIndex : 'check_sql',
+		align : 'left',
+		flex : 1
+	}, {
+		text : '历史源校验SQL',
+		dataIndex : 'check_history_sql',
+		align : 'left',
+		flex : 1
+	}, {
+		text : '删除规则SQL',
 		dataIndex : 'sql_txt',
 		align : 'left',
 		flex : 1
+	}, {
+		text : '作业名称',
+		dataIndex : 'job_name',
+		align : 'left',
+		flex : 1
+	},{
+		text : '修改时间',
+		dataIndex : 'modify_time',
+		align : 'left',
+		flex : 1,
+		renderer : function(value, record) {
+			if (value) {
+				return Ext.Date.format(value, 'Y-m-d H:i:s')
+			}
+			return '';
+		}
+
 	}, {
 		text : '创建时间',
 		dataIndex : 'create_time',
@@ -43,12 +99,16 @@ Ext.define('Dcs.reg.RegListView', {
 
 	} ],
 	fullscreen : true,
-	renderTo : Ext.getBody(),
 	selModel : {
 		selType : 'checkboxmodel',
-		mode : 'SINGLE'
-
+		mode : 'SINGLE',
+		allowDeselect: true
 	},
+	bbar: {
+        xtype: 'pagingtoolbar',
+        displayInfo: true,
+        plugins: 'ux-progressbarpager'
+    },
 	tbar : [ {
 		xtype : 'button',
 		text : '新增',

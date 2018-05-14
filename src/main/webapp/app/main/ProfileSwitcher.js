@@ -1,17 +1,17 @@
-Ext.define('Dcs.main.ProfileSwitcher', {
+Ext.define('App.main.ProfileSwitcher', {
     extend: 'Ext.Component',
     xtype: 'profileSwitcher',
-    cls: 'ks-profile-switcher',
+    cls: [ 'ks-profile-switcher', 'x-fa', 'fa-bars' ],
 
     initComponent: function() {
         var me = this,
             menuItems = [],
             classicProfiles = {
-                triton: 'Triton',
+        		crisp: 'Crisp',
+        		'crisp-touch': 'Crisp Touch',
                 neptune: 'Neptune',
                 'neptune-touch': 'Neptune Touch',
-                crisp: 'Crisp',
-                'crisp-touch': 'Crisp Touch',
+                triton: 'Triton',
                 classic: 'Classic',
                 gray: 'Gray'
             },

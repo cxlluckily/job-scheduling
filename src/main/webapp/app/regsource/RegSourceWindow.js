@@ -1,106 +1,88 @@
-//The data store containing the list of states
-/*var sources = Ext.create('Ext.data.Store', {
-	fields : [ 'name', 'value' ],
+Ext.define('App.regsource.RegSourceTypeStore', {
+	extend : "Ext.data.Store",
+	fields : [ "Name", "Value" ],
 	data : [ {
-		"value" : "1",
-		"name" : "db1"
+		Name : "历史数据源",
+		Value : 0
 	}, {
-		"value" : "2",
-		"name" : "db2"
-	}, {
-		"value" : "3",
-		"name" : "db3"
+		Name : "清理数据源",
+		Value : 1
 	} ]
-});*/
+});
 
-/*Ext.define('Dcs.reg.RegSourceStore', {
-	extend : 'Ext.data.Store',
-	model : Ext.create('Ext.data.Model',{
-		fields : [{
-			name : 'id',
-			type : 'string'
-		}, {
-			name : 'slave_url',
-			type : 'string'
-		}]
-	}),
-	proxy : {
-		type : 'ajax',
-		url : 'dataSource/list.do',
-		reader : {
-			type : 'json',
-			rootProperty : ''
-		}
-	},
-	autoLoad : true
-
-});*/
-
-// Create the combo box, attached to the states data store
-/*var sourceCombo = Ext.create('Ext.form.ComboBox', {
-	fieldLabel : '数据源',
-	store : Ext.create('Dcs.reg.RegSourceStore'),
-	queryMode : 'local',
-	name : 'source_id',
-	editable : false,
-	displayField : 'slave_url',
-	valueField : 'id',
-	allowBlank : false
-		
-});*/
-
-var regSourceForm = Ext.create('Ext.form.Panel', {
+Ext.define('App.regsource.RegSourceForm', {
+	extend : 'Ext.form.Panel',
 	fullscreen : true,
 	layout : 'column',
-	xtype: 'regsourceform',
+	xtype : 'regsourceform',
 	items : [ {
-		xtype: 'fieldset',
+		xtype : 'fieldset',
 		columnWidth : 1,
 		defaultType : 'textfield',
 		defaults : {
 			anchor : '100%'
 		},
 		fullscreen : true,
-		border: 1,
+		border : 1,
 		layout : 'anchor',
-		items : [  {
+		items : [ {
+			xtype : 'combobox',
+			fieldLabel : "数据源类型",
+			store : {
+				xclass : 'App.regsource.RegSourceTypeStore'
+			},
+			editable : false,
+			name : 'source_type',
+			displayField : "Name",
+			valueField : "Value",
+			queryMode : "local",
+			allowBlank : false,
+			blankText : '请输入数据源类型!',
+			mode : 'remote'
+		}, {
+			xtype : 'textfield',
+			grow : false,
+			name : 'source_name',
+			fieldLabel : '数据源名称',
+			allowBlank : false
+		}, {
 			xtype : 'textfield',
 			name : 'master_url',
 			fieldLabel : '主库地址',
 			allowBlank : false
 		}, {
 			xtype : 'textfield',
-			grow      : false,
+			grow : false,
 			name : 'master_username',
 			fieldLabel : '主库用户名'
 		}, {
 			xtype : 'textfield',
-			grow      : false,
+			grow : false,
 			name : 'master_password',
 			fieldLabel : '主库密码'
-		},{
+		}, {
 			xtype : 'textfield',
-			grow      : false,
+			grow : false,
 			name : 'slave_url',
 			fieldLabel : '从库地址'
-		},{
+		}, {
 			xtype : 'textfield',
-			grow      : false,
+			grow : false,
 			name : 'slave_username',
 			fieldLabel : '从库用户名'
-		},{
+		}, {
 			xtype : 'textfield',
-			grow      : false,
+			grow : false,
 			name : 'slave_password',
 			fieldLabel : '从库密码'
-		},{
+		}, {
 			xtype : 'hiddenfield',
 			name : 'id'
-		}]
-	}]
+		} ]
+	} ]
 });
 
-Ext.define('Dcs.regsource.RegSourceWindow', {
+Ext.define('App.regsource.RegSourceWindow', {
 	extend : 'Ext.window.Window',
 	title : '{title}',
 	width : 660,
@@ -108,20 +90,22 @@ Ext.define('Dcs.regsource.RegSourceWindow', {
 	iconCls : "addicon",
 	resizable : true,
 	draggable : true,
-	collapsible : true, 
-	closeAction : 'close',
+	collapsible : true,
+	closeAction : 'destroy',
 	closable : true,
 	modal : true,
-	autoRender : true,
+	// autoRender : true,
 	buttonAlign : "center",
-	xtype:'regsourcewin',
-	controller: 'regSourceController',
-	viewAction: '{viewAction}',
-	items : [ regSourceForm ],
+	xtype : 'regsourcewin',
+	controller : 'regSourceController',
+	viewAction : '{viewAction}',
+	items : [ {
+		xtype : 'regsourceform'
+	} ],
 	buttons : [ {
 		text : "保 存",
 		minWidth : 70,
-		action: 'save'
+		action : 'save'
 	}, {
 		text : "关 闭",
 		minWidth : 70,

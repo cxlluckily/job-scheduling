@@ -19,7 +19,6 @@ package com.shankephone.elasticjob.restful;
 
 import java.util.Collection;
 
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -27,6 +26,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.springframework.stereotype.Component;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.dangdang.ddframe.job.lite.lifecycle.api.ServerStatisticsAPI;
 import com.dangdang.ddframe.job.lite.lifecycle.domain.JobBriefInfo;
 import com.dangdang.ddframe.job.lite.lifecycle.domain.ServerBriefInfo;
 import com.google.common.base.Optional;
@@ -38,6 +42,7 @@ import com.shankephone.elasticjob.service.impl.JobAPIServiceImpl;
  *
  * @author caohao
  */
+@Component
 @Path("/servers")
 public final class ServerOperationRestfulApi {
     
@@ -51,7 +56,12 @@ public final class ServerOperationRestfulApi {
     @GET
     @Path("/count")
     public int getServersTotalCount() {
-        return jobAPIService.getServerStatisticsAPI().getServersTotalCount();
+    	int count=0;
+    	ServerStatisticsAPI api = jobAPIService.getServerStatisticsAPI();
+    	if(api!=null){
+    		count=api.getServersTotalCount();
+    	}
+        return count;
     }
     
     /**
@@ -61,8 +71,20 @@ public final class ServerOperationRestfulApi {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<ServerBriefInfo> getAllServersBriefInfo() {
-        return jobAPIService.getServerStatisticsAPI().getAllServersBriefInfo();
+    public String getAllServersBriefInfo() {
+    	JSONObject json = new JSONObject();
+    	Collection<ServerBriefInfo>	list = null;
+    	int	totalCount = 0;
+    	JSONArray array = new JSONArray();
+		ServerStatisticsAPI api= jobAPIService.getServerStatisticsAPI();
+		if(api!=null){
+			list = api.getAllServersBriefInfo();
+			totalCount = jobAPIService.getServerStatisticsAPI().getServersTotalCount();
+			array=JSONArray.parseArray(JSONArray.toJSONString(list));
+		}
+    	json.put("list", array);
+        json.put("totalCount", totalCount);
+        return json.toJSONString();
     }
     
     /**
@@ -72,8 +94,12 @@ public final class ServerOperationRestfulApi {
      */
     @POST
     @Path("/{serverIp}/disable")
-    public void disableServer(@PathParam("serverIp") final String serverIp) {
+    public String disableServer(@PathParam("serverIp") final String serverIp) {
+    	JSONObject json = new JSONObject();
+    	json.put("success", false);
         jobAPIService.getJobOperatorAPI().disable(Optional.<String>absent(), Optional.of(serverIp));
+        json.put("success", true);
+        return json.toJSONString();
     }
     
     /**
@@ -81,10 +107,14 @@ public final class ServerOperationRestfulApi {
      *
      * @param serverIp 服务器IP地址
      */
-    @DELETE
-    @Path("/{serverIp}/disable")
-    public void enableServer(@PathParam("serverIp") final String serverIp) {
+    @POST
+    @Path("/{serverIp}/enable")
+    public String enableServer(@PathParam("serverIp") final String serverIp) {
+    	JSONObject json = new JSONObject();
+    	json.put("success", false);
         jobAPIService.getJobOperatorAPI().enable(Optional.<String>absent(), Optional.of(serverIp));
+        json.put("success", true);
+        return json.toJSONString();
     }
     
     /**
@@ -94,8 +124,12 @@ public final class ServerOperationRestfulApi {
      */
     @POST
     @Path("/{serverIp}/shutdown")
-    public void shutdownServer(@PathParam("serverIp") final String serverIp) {
+    public String shutdownServer(@PathParam("serverIp") final String serverIp) {
+    	JSONObject json = new JSONObject();
+    	json.put("success", false);
         jobAPIService.getJobOperatorAPI().shutdown(Optional.<String>absent(), Optional.of(serverIp));
+        json.put("success", true);
+        return json.toJSONString();
     }
     
     /**
@@ -103,10 +137,14 @@ public final class ServerOperationRestfulApi {
      *
      * @param serverIp 服务器IP地址
      */
-    @DELETE
-    @Path("/{serverIp}")
-    public void removeServer(@PathParam("serverIp") final String serverIp) {
+    @POST
+    @Path("/{serverIp}/delete")
+    public String removeServer(@PathParam("serverIp") final String serverIp) {
+    	JSONObject json = new JSONObject();
+    	json.put("success", false);
         jobAPIService.getJobOperatorAPI().remove(Optional.<String>absent(), Optional.of(serverIp));
+        json.put("success", true);
+        return json.toJSONString();
     }
     
     /**
@@ -118,8 +156,13 @@ public final class ServerOperationRestfulApi {
     @GET
     @Path("/{serverIp}/jobs")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<JobBriefInfo> getJobs(@PathParam("serverIp") final String serverIp) {
-        return jobAPIService.getJobStatisticsAPI().getJobsBriefInfo(serverIp);
+    public String getJobs(@PathParam("serverIp") final String serverIp) {
+    	JSONObject json = new JSONObject();
+    	Collection<JobBriefInfo> list=jobAPIService.getJobStatisticsAPI().getJobsBriefInfo(serverIp);
+    	JSONArray array = JSONArray.parseArray(JSONArray.toJSONString(list));
+    	json.put("list", array);
+    	json.put("totalCount", list.size());
+        return json.toJSONString();
     }
     
     /**
@@ -130,8 +173,12 @@ public final class ServerOperationRestfulApi {
      */
     @POST
     @Path("/{serverIp}/jobs/{jobName}/disable")
-    public void disableServerJob(@PathParam("serverIp") final String serverIp, @PathParam("jobName") final String jobName) {
-        jobAPIService.getJobOperatorAPI().disable(Optional.of(jobName), Optional.of(serverIp));
+    public String disableServerJob(@PathParam("serverIp") final String serverIp, @PathParam("jobName") final String jobName) {
+    	JSONObject json = new JSONObject();
+    	json.put("success", false);
+    	jobAPIService.getJobOperatorAPI().disable(Optional.of(jobName), Optional.of(serverIp));
+    	json.put("success", true);
+        return json.toJSONString();
     }
     
     /**
@@ -140,10 +187,14 @@ public final class ServerOperationRestfulApi {
      * @param serverIp 服务器IP地址
      * @param jobName 作业名称
      */
-    @DELETE
-    @Path("/{serverIp}/jobs/{jobName}/disable")
-    public void enableServerJob(@PathParam("serverIp") final String serverIp, @PathParam("jobName") final String jobName) {
-        jobAPIService.getJobOperatorAPI().enable(Optional.of(jobName), Optional.of(serverIp));
+    @POST
+    @Path("/{serverIp}/jobs/{jobName}/enable")
+    public String enableServerJob(@PathParam("serverIp") final String serverIp, @PathParam("jobName") final String jobName) {
+    	JSONObject json = new JSONObject();
+    	json.put("success", false);
+    	jobAPIService.getJobOperatorAPI().enable(Optional.of(jobName), Optional.of(serverIp));
+        json.put("success", true);
+        return json.toJSONString();
     }
     
     /**
@@ -154,8 +205,12 @@ public final class ServerOperationRestfulApi {
      */
     @POST
     @Path("/{serverIp}/jobs/{jobName}/shutdown")
-    public void shutdownServerJob(@PathParam("serverIp") final String serverIp, @PathParam("jobName") final String jobName) {
-        jobAPIService.getJobOperatorAPI().shutdown(Optional.of(jobName), Optional.of(serverIp));
+    public String shutdownServerJob(@PathParam("serverIp") final String serverIp, @PathParam("jobName") final String jobName) {
+    	JSONObject json = new JSONObject();
+    	json.put("success", false);
+    	jobAPIService.getJobOperatorAPI().shutdown(Optional.of(jobName), Optional.of(serverIp));
+    	json.put("success", true);
+        return json.toJSONString();
     }
     
     /**
@@ -164,9 +219,13 @@ public final class ServerOperationRestfulApi {
      * @param serverIp 服务器IP地址
      * @param jobName 作业名称
      */
-    @DELETE
+    @POST
     @Path("/{serverIp}/jobs/{jobName}")
-    public void removeServerJob(@PathParam("serverIp") final String serverIp, @PathParam("jobName") final String jobName) {
-        jobAPIService.getJobOperatorAPI().remove(Optional.of(jobName), Optional.of(serverIp));
+    public String removeServerJob(@PathParam("serverIp") final String serverIp, @PathParam("jobName") final String jobName) {
+    	JSONObject json = new JSONObject();
+    	json.put("success", false);
+    	jobAPIService.getJobOperatorAPI().remove(Optional.of(jobName), Optional.of(serverIp));
+        json.put("success", true);
+        return json.toJSONString();
     }
 }

@@ -34,7 +34,7 @@ public interface RegistryCenterService {
      *
      * @return 全部注册中心配置
      */
-    List<RegistryCenter> loadAll();
+    List<RegistryCenter> loadAll(Integer start, Integer limit);
     
     /**
      * 读取注册中心配置.
@@ -80,4 +80,10 @@ public interface RegistryCenterService {
      * @param id
      */
 	void updateActivated(Long id);
+
+	/**
+	 * 总数
+	 * @return
+	 */
+	long queryTotalCount();
 }

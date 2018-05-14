@@ -1,49 +1,27 @@
-@font-face {
-    font-family: 'backgrounds';
-    src:    url('../backgrounds/fonts/backgrounds.eot?thfc7b');
-    src:    url('../backgrounds/fonts/backgrounds.eot?thfc7b#iefix') format('embedded-opentype'),
-        url('../backgrounds/fonts/backgrounds.ttf?thfc7b') format('truetype'),
-        url('../backgrounds/fonts/backgrounds.woff?thfc7b') format('woff'),
-        url('../backgrounds/fonts/backgrounds.svg?thfc7b#backgrounds') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-
-[class^="bg-"], [class*=" bg-"] {
-    /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'backgrounds' !important;
-    speak: none;
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
-
-    /* Better Font Rendering =========== */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-.bg-border-square:before {
-    content: "\e710";
-}
-.bg-square:before {
-    content: "\e6c9";
-}
-.bg-rounded-square:before {
-    content: "\e6d1";
-}
-.bg-circle:before {
-    content: "\e70d";
-}
-.bg-border-circle:before {
-    content: "\e712";
-}
-
 [class^="icon-"], [class*=" icon-"],
 [class^="fa-"], [class*=" fa-"]{
 	font-family: FontAwesome
 }
-.oms-panel-body {
+.App-panel-body {
 	background-image: url(../../ext/classic/resources/images/square.gif)
+}
+#app-header-logo {
+	background-repeat:no-repeat;
+	background-image: url(../images/logo.png);
+	background-size:58px 35px;
+	background-position:center;
+	height: 40px;
+	width: 60px;
+}
+#historyFormState label, #historyFormState label span {
+	width: 38px !important;
+}
+#historyFormJobName label, #historyFormJobName label span {
+	width: 68px !important;
+}
+#traceRadiofieldWidth label, #traceRadiofieldWidth label span {
+	width: 72px !important;
+}
+#startTimeWidth .x-form-text-field-body-default, #endTimeWidth .x-form-text-field-body-default {
+	min-width: 0;
 }

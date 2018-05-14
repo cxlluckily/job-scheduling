@@ -15,10 +15,27 @@ public class DBDataSourceServiceImpl implements DBDataSourceService {
 
 	@Resource
 	private DBDataSourceDao dataSourceDao;
+	
+	@Override
+	public List<DBDataSource> list(Integer start,Integer limit) {
 
-	public List<DBDataSource> list() {
+		List<DBDataSource> list = dataSourceDao.queryList(start, limit);
 
-		List<DBDataSource> list = dataSourceDao.queryList();
+		return list;
+	}
+	
+	@Override
+	public List<DBDataSource> cleanList() {
+
+		List<DBDataSource> list = dataSourceDao.queryCleanList();
+
+		return list;
+	}
+	
+	@Override
+	public List<DBDataSource> historyList() {
+
+		List<DBDataSource> list = dataSourceDao.queryHistoryList();
 
 		return list;
 	}
@@ -43,4 +60,8 @@ public class DBDataSourceServiceImpl implements DBDataSourceService {
 		return dataSourceDao.update(source);
 	}
 
+	@Override
+	public long queryTotalCount() {
+		return dataSourceDao.queryTotalCount();
+	}
 }

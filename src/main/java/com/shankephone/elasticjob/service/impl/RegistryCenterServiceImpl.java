@@ -40,8 +40,8 @@ public final class RegistryCenterServiceImpl implements RegistryCenterService {
 	private RegistryCenterDao registryCenterDao;
 	
     @Override
-    public List<RegistryCenter> loadAll() {
-        return registryCenterDao.queryList();
+    public List<RegistryCenter> loadAll(Integer start,Integer limit) {
+        return registryCenterDao.queryList(start, limit);
     }
     
     @Override
@@ -80,6 +80,11 @@ public final class RegistryCenterServiceImpl implements RegistryCenterService {
 	public void updateActivated(Long id) {
 		registryCenterDao.updateActivated(id);
 		
+	}
+
+	@Override
+	public long queryTotalCount() {
+		return registryCenterDao.queryTotalCount();
 	}
     
    

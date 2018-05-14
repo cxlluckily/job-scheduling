@@ -17,10 +17,16 @@
 
 package com.shankephone.elasticjob.service.impl;
 
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
 import com.google.common.base.Optional;
+import com.shankephone.elasticjob.dao.EventTraceDataSourceDao;
 import com.shankephone.elasticjob.model.EventTraceDataSource;
 import com.shankephone.elasticjob.model.EventTraceDataSourceConfigurations;
-import com.shankephone.elasticjob.model.GlobalConfiguration;
 import com.shankephone.elasticjob.service.EventTraceDataSourceConfigurationService;
 
 /**
@@ -28,82 +34,44 @@ import com.shankephone.elasticjob.service.EventTraceDataSourceConfigurationServi
  *
  * @author caohao
  */
+@Service("eventTraceDataSourceConfigurationService")
 public final class EventTraceDataSourceServiceImpl implements EventTraceDataSourceConfigurationService {
     
+	@Resource
+	private EventTraceDataSourceDao eventTraceDataSourceDao;
     
     @Override
-    public EventTraceDataSourceConfigurations loadAll() {
-        return loadGlobal().getEventTraceDataSourceConfigurations();
+    public List<EventTraceDataSource> loadAll() {
+        return eventTraceDataSourceDao.queryList();
     }
     
     @Override
-    public EventTraceDataSource load(final String name) {
-        GlobalConfiguration configs = loadGlobal();
-        EventTraceDataSource result = find(name, configs.getEventTraceDataSourceConfigurations());
-        setActivated(configs, result);
-        return result;
-    }
-    
-    @Override
-    public EventTraceDataSource find(final String name, final EventTraceDataSourceConfigurations configs) {
-        for (EventTraceDataSource each : configs.getEventTraceDataSourceConfiguration()) {
-            if (name.equals(each.getName())) {
-                return each;
-            }
-        }
-        return null;
-    }
-    
-    private void setActivated(final GlobalConfiguration configs, final EventTraceDataSource toBeConnectedConfig) {
-        EventTraceDataSource activatedConfig = findActivatedDataSourceConfiguration(configs);
-        if (!toBeConnectedConfig.equals(activatedConfig)) {
-            if (null != activatedConfig) {
-                activatedConfig.setActivated(false);
-            }
-            toBeConnectedConfig.setActivated(true);
-            //configurationsXmlRepository.save(configs);
-        }
+    public EventTraceDataSource load(final Long id) {
+        return eventTraceDataSourceDao.queryById(id);
     }
     
     @Override
     public Optional<EventTraceDataSource> loadActivated() {
-        return Optional.fromNullable(findActivatedDataSourceConfiguration(loadGlobal()));
-    }
-    
-    private EventTraceDataSource findActivatedDataSourceConfiguration(final GlobalConfiguration configs) {
-        for (EventTraceDataSource each : configs.getEventTraceDataSourceConfigurations().getEventTraceDataSourceConfiguration()) {
-            if (each.isActivated()) {
-                return each;
-            }
-        }
-        return null;
+        return Optional.fromNullable(eventTraceDataSourceDao.loadActivated());
     }
     
     @Override
     public boolean add(final EventTraceDataSource config) {
-        GlobalConfiguration configs = loadGlobal();
-        boolean result = configs.getEventTraceDataSourceConfigurations().getEventTraceDataSourceConfiguration().add(config);
-        if (result) {
-            //configurationsXmlRepository.save(configs);
-        }
-        return result;
+    	int count = eventTraceDataSourceDao.insert(config);
+        return count > 0 ? true : false;
     }
     
     @Override
-    public void delete(final String name) {
-        GlobalConfiguration configs = loadGlobal();
-        EventTraceDataSource toBeRemovedConfig = find(name, configs.getEventTraceDataSourceConfigurations());
-        if (null != toBeRemovedConfig) {
-            configs.getEventTraceDataSourceConfigurations().getEventTraceDataSourceConfiguration().remove(toBeRemovedConfig);
-            //configurationsXmlRepository.save(configs);
-        }
+    public boolean delete(final Long id) {
+    	int count = eventTraceDataSourceDao.deleteById(id);
+    	return count > 0 ? true : false;
     }
+
+	@Override
+	public void updateActivated(Long id) {
+		
+		eventTraceDataSourceDao.updateActivated(id);
+	}
     
-    private GlobalConfiguration loadGlobal() {
-        GlobalConfiguration result = null;//configurationsXmlRepository.load();
-        if (null == result.getEventTraceDataSourceConfigurations()) {
-            result.setEventTraceDataSourceConfigurations(new EventTraceDataSourceConfigurations());
-        }
-        return result;
-    }
+   
 }

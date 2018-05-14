@@ -1,4 +1,4 @@
-Ext.define('Dcs.main.NavStore', {
+Ext.define('App.main.NavStore', {
     extend: 'Ext.data.TreeStore',
     alias: 'NavStore',
 
@@ -24,24 +24,17 @@ Ext.define('Dcs.main.NavStore', {
 			    //iconCls: 'fa-users',
 			    iconCls: 'fa-user-plus',
 			    children: [
-			        { id: 'registryCenterList', iconCls: 'fa-user', text: '注册中心', leaf: true },
-			        { id: 'job-source', iconCls: 'fa-user', text: '作业数据源管理', leaf: true },
-			        { id: 'job-rule', iconCls: 'fa-user', text: '作业配置管理', leaf: true },
-			        { id: 'job-instance', iconCls: 'fa-user', text: '作业服务管理', leaf: true },
-			        { id: 'job-event-trace', iconCls: 'fa-user', text: '作业事件跟踪', leaf: true },
-			        { id: 'job-node', iconCls: 'fa-user', text: '服务器配置管理', leaf: true }
+			        { id: 'jarManagementList', xclass:"App.jar.JarManagementListView", iconCls: 'fa-user', text: '程序管理', leaf: true },
+			        { id: 'jobList', xclass:"App.job.JobListView", iconCls: 'fa-user', text: '作业配置管理', leaf: true },
+			        { id: 'jobnoderelation', xclass:"App.jobNodeRelation.JobNodeRelationView", iconCls: 'fa-user', text: '作业服务管理', leaf: true },
+			        { id: 'serverDimensionList', xclass:"App.serverDimension.ServerDimensionListView", iconCls: 'fa-user', text: '服务器维度管理', leaf: true },
+                    { id: 'traceList', xclass:"App.jobtrace.TraceListView", iconCls: 'fa-user', text: '作业事件跟踪', leaf: true },
+                    { id: 'historyList', xclass:"App.jobhistory.HistoryListView", iconCls: 'fa-user', text: '作业事件历史', leaf: true },
+			        { id: 'jobexecnodes', xclass:"App.jobExecNodes.JobExecNodesView", iconCls: 'fa-user', text: '服务器配置管理', leaf: true },
+			        { id: 'registryCenterList', xclass:"App.regcenter.RegistryCenterListView", iconCls: 'fa-user', text: '注册中心', leaf: true },
+			        { id: 'dataSourceList', xclass:"App.datasource.DataSourceListView", iconCls: 'fa-user', text: '作业数据源管理', leaf: true }
 			    ]
 			},
-            { 
-                text: 'jar包管理',
-                id: 'jar',
-                expanded: true,
-                //iconCls: 'fa-users',
-                iconCls: 'fa-user-plus',
-                children: [
-                    { id: 'jar-list', iconCls: 'fa-user', text: 'jar包列表', leaf: true }
-                ]
-            },
             {
                 text: '规则管理',
                 id: 'regular',
@@ -49,8 +42,8 @@ Ext.define('Dcs.main.NavStore', {
                 iconCls: 'fa-user-plus',
                 expanded: true,
                 children: [
-                    { id: 'regsource', iconCls: 'fa-male', text: '数据源管理', leaf: true},
-                    { id: 'reglist', iconCls: 'fa-male', text: 'SQL规则管理', leaf: true }/*,
+                    { id: 'regsource', xclass:"App.regsource.RegSourceView", iconCls: 'fa-male', text: '数据源管理', leaf: true},
+                    { id: 'reglist', xclass:"App.reg.RegListView", iconCls: 'fa-male', text: 'SQL规则管理', leaf: true }/*,
                     { id: 'regular-list', iconCls: 'fa-male', text: '规则管理', leaf: true}*/
                 ]
             }

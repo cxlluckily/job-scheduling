@@ -1,17 +1,22 @@
-Ext.define('Dcs.main.MainView', {
+Ext.define('App.main.MainView', {
 	extend : 'Ext.container.Viewport',
-	controller: 'main',
-	viewModel: 'main',
+	controller : {
+		xclass : "App.main.MainController"
+	},
+	viewModel : {
+		xclass : "App.main.MainModel"
+	},
 	layout : 'border',
 	stateful : true,
-	stateId : 'dcs-viewport',
+	stateId : 'App-viewport',
 	requires : [
-	            'Dcs.main.HeaderView',
-	            'Dcs.main.NavStore',
-	            'Dcs.main.NavTreeView',
-	            'Dcs.main.ContentPanelView',
-	            'Dcs.main.MainController'
-	],
+		'App.main.MainController',
+	    'App.main.HeaderView',
+	    'App.main.ProfileSwitcher',
+	    'App.main.NavStore',
+		'App.main.NavTreeView', 
+		'App.main.ContentPanelView'
+	],	
 	items : [ {
 		region : 'north',
 		xtype : 'appHeader'
@@ -19,13 +24,13 @@ Ext.define('Dcs.main.MainView', {
 		region : 'west',
 		reference : 'tree',
 		xtype : 'navigation-tree'
-	} , {
-	        region: 'center',
-	        xtype: 'contentPanel',
-	        reference: 'contentPanel',
-	        ariaRole: 'main'
-	    }],
-	
+	}, {
+		region : 'center',
+		xtype : 'contentPanel',
+		reference : 'contentPanel',
+		ariaRole : 'main'
+	} ],
+
 	applyState : function(state) {
 		this.getController().applyState(state);
 
@@ -34,20 +39,18 @@ Ext.define('Dcs.main.MainView', {
 	getState : function() {
 		return this.getController().getState();
 	},
-	
+
 	initComponent : function() {
-        Ext.create('Dcs.main.NavStore', {
-            storeId: 'navigation'
-        });		
+		Ext.create('App.main.NavStore', {
+			storeId : 'navigation'
+		});
 		this.callParent();
 	}
 });
 
-Ext.define('Dcs.main.MainModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.main',
-
-    data: {
-        selectedView: false
-    }
+Ext.define('App.main.MainModel', {
+	extend : 'Ext.app.ViewModel',
+	data : {
+		selectedView : false
+	}
 });

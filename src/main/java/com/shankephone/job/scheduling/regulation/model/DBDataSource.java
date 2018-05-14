@@ -2,6 +2,8 @@ package com.shankephone.job.scheduling.regulation.model;
 
 import java.util.Date;
 
+import com.shankephone.job.scheduling.common.BaseModel;
+
 /**
  * 数据源
  * 
@@ -19,6 +21,8 @@ public class DBDataSource extends BaseModel{
 	private String slave_password;
 	private Date create_time;
 	private Date modify_time;
+	private String source_type;
+	private String source_name;
 
 	public String getId() {
 		return id;
@@ -92,6 +96,22 @@ public class DBDataSource extends BaseModel{
 		this.modify_time = modify_time;
 	}
 
+	public String getSource_type() {
+		return source_type;
+	}
+
+	public void setSource_type(String source_type) {
+		this.source_type = source_type;
+	}
+
+	public String getSource_name() {
+		return source_name;
+	}
+
+	public void setSource_name(String source_name) {
+		this.source_name = source_name;
+	}
+    
 	
 
 }
